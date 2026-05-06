@@ -56,7 +56,10 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.COMMON,
     slot: EquipmentSlot.WEAPON,
-    requirements: [],
+    setId: 'hierro_negro',
+    requirements: [
+      { stat: 'attack', minValue: 4 },
+    ],
     effects: [
       { type: 'stat_modifier', stat: 'attack', amount: 3, description: '+3 Ataque' },
     ],
@@ -68,7 +71,9 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.COMMON,
     slot: EquipmentSlot.WEAPON,
-    requirements: [],
+    requirements: [
+      { stat: 'power', minValue: 4 },
+    ],
     effects: [
       { type: 'stat_modifier', stat: 'power', amount: 3, description: '+3 Poder' },
     ],
@@ -80,7 +85,10 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.UNCOMMON,
     slot: EquipmentSlot.ARMOR,
-    requirements: [],
+    setId: 'hierro_negro',
+    requirements: [
+      { stat: 'defense', minValue: 4 },
+    ],
     effects: [
       { type: 'stat_modifier', stat: 'defense', amount: 5, description: '+5 Defensa' },
       { type: 'stat_modifier', stat: 'speed', amount: -1, description: '-1 Velocidad' },
@@ -93,7 +101,10 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.UNCOMMON,
     slot: EquipmentSlot.ARMOR,
-    requirements: [],
+    setId: 'velo_cazador',
+    requirements: [
+      { stat: 'speed', minValue: 6 },
+    ],
     effects: [
       { type: 'stat_modifier', stat: 'speed', amount: 2, description: '+2 Velocidad' },
       { type: 'stat_modifier', stat: 'crit', amount: 5, description: '+5% Crítico' },
@@ -106,7 +117,10 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.RARE,
     slot: EquipmentSlot.AMULET,
-    requirements: [],
+    setId: 'voto_hueco',
+    requirements: [
+      { stat: 'resistance', minValue: 10 },
+    ],
     effects: [
       { type: 'on_combat_start', description: 'Empieza combate con +2 Vigor.' },
     ],
@@ -117,6 +131,7 @@ export const items: ItemData[] = [
     name: 'Estandarte Roto',
     category: ItemCategory.RELIC,
     rarity: Rarity.RARE,
+    setId: 'voto_hueco',
     requirements: [],
     effects: [
       { type: 'on_combat_start', description: 'Toda la party empieza combate con +1 Vigor.' },
@@ -185,7 +200,7 @@ export const items: ItemData[] = [
     id: 'marca_pregonero',
     name: 'Marca del Pregonero',
     category: ItemCategory.RELIC,
-    rarity: Rarity.EPIC,
+    rarity: Rarity.RARE,
     requirements: [],
     effects: [
       { type: 'passive_effect', description: 'Marcar dura +1 turno y aplica Vulnerable.' },
@@ -220,11 +235,60 @@ export const items: ItemData[] = [
     category: ItemCategory.EQUIPMENT,
     rarity: Rarity.COMMON,
     slot: EquipmentSlot.AMULET,
-    requirements: [],
+    setId: 'velo_cazador',
+    requirements: [
+      { stat: 'attack', minValue: 5 },
+    ],
     effects: [
       { type: 'stat_modifier', stat: 'crit', amount: 5, description: '+5% Crítico' },
     ],
     description: '+5% Crítico.',
+  },
+  {
+    id: 'hoja_caido',
+    name: 'Hoja del Caido',
+    category: ItemCategory.EQUIPMENT,
+    rarity: Rarity.EPIC,
+    slot: EquipmentSlot.WEAPON,
+    setId: 'hierro_negro_avanzado',
+    requirements: [
+      { stat: 'attack', minValue: 12 },
+    ],
+    effects: [
+      { type: 'stat_modifier', stat: 'attack', amount: 6, description: '+6 Ataque' },
+    ],
+    description: '+6 Ataque.',
+  },
+  {
+    id: 'yelmo_voto',
+    name: 'Yelmo del Voto',
+    category: ItemCategory.EQUIPMENT,
+    rarity: Rarity.EPIC,
+    slot: EquipmentSlot.ARMOR,
+    setId: 'voto_hueco_avanzado',
+    requirements: [
+      { stat: 'defense', minValue: 10 },
+    ],
+    effects: [
+      { type: 'stat_modifier', stat: 'defense', amount: 4, description: '+4 Defensa' },
+      { type: 'stat_modifier', stat: 'hpMax', amount: 5, description: '+5 HP max' },
+    ],
+    description: '+4 Defensa, +5 HP max.',
+  },
+  {
+    id: 'vara_cenizas',
+    name: 'Vara de Cenizas',
+    category: ItemCategory.EQUIPMENT,
+    rarity: Rarity.EPIC,
+    slot: EquipmentSlot.WEAPON,
+    setId: 'cenizas_orden',
+    requirements: [
+      { stat: 'power', minValue: 12 },
+    ],
+    effects: [
+      { type: 'stat_modifier', stat: 'power', amount: 6, description: '+6 Poder' },
+    ],
+    description: '+6 Poder.',
   },
   {
     id: 'cinta_manchada',

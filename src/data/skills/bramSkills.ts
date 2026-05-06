@@ -6,6 +6,50 @@ import {
   StatusEffectId,
 } from '@/types';
 
+const bramProvocarPlus: SkillData = {
+  id: 'bram_provocar_plus',
+  name: 'Provocar+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 1,
+  target: SkillTarget.SELF,
+  effects: [
+    { type: 'buff', amount: 30 },
+  ],
+  description: 'Redirige los proximos 2 ataques enemigos a Bram. +30% Defensa este turno.',
+  characterId: 'bram',
+};
+
+const bramEscudoHierroPlus: SkillData = {
+  id: 'bram_escudo_hierro_plus',
+  name: 'Escudo de Hierro+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 3,
+  target: SkillTarget.SINGLE_ALLY,
+  effects: [
+    { type: 'block', amount: 18 },
+    { type: 'apply_status', statusId: StatusEffectId.PROTECTED, stacks: 1 },
+  ],
+  description: 'Otorga 18 de Bloque y aplica Protegido a un aliado.',
+  characterId: 'bram',
+};
+
+const bramEmbestidaPlus: SkillData = {
+  id: 'bram_embestida_plus',
+  name: 'Embestida+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 2,
+  target: SkillTarget.SINGLE_ENEMY,
+  effects: [
+    { type: 'damage', amount: 10, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'apply_status', statusId: StatusEffectId.STUN, stacks: 1 },
+  ],
+  description: '10 dano + Aturdimiento (1 turno).',
+  characterId: 'bram',
+};
+
 export const bramSkills: SkillData[] = [
   {
     id: 'bram_basic',
@@ -34,6 +78,7 @@ export const bramSkills: SkillData[] = [
     description:
       'El próximo ataque enemigo dirigido a un aliado se redirige a Bram. +30% Defensa este turno.',
     characterId: 'bram',
+    improvedVersion: bramProvocarPlus,
   },
   {
     id: 'bram_escudo_hierro',
@@ -48,6 +93,7 @@ export const bramSkills: SkillData[] = [
     ],
     description: 'Bram gana 15 de Bloque. Aplica Protegido a un aliado.',
     characterId: 'bram',
+    improvedVersion: bramEscudoHierroPlus,
   },
   {
     id: 'bram_embestida',
@@ -62,6 +108,7 @@ export const bramSkills: SkillData[] = [
     ],
     description: '8 daño + Aturdimiento (1 turno).',
     characterId: 'bram',
+    improvedVersion: bramEmbestidaPlus,
   },
   {
     id: 'bram_ult_estandarte',

@@ -6,6 +6,53 @@ import {
   StatusEffectId,
 } from '@/types';
 
+const veraTajoDoblePlus: SkillData = {
+  id: 'vera_tajo_doble_plus',
+  name: 'Tajo Doble+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 2,
+  target: SkillTarget.SINGLE_ENEMY,
+  effects: [
+    { type: 'damage', amount: 6, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'damage', amount: 6, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'apply_status', statusId: StatusEffectId.BLEED, stacks: 2 },
+  ],
+  description: '2 golpes de 6 dano cada uno. Aplica 2 stacks de Sangrado.',
+  characterId: 'vera',
+};
+
+const veraCorteProfundoPlus: SkillData = {
+  id: 'vera_corte_profundo_plus',
+  name: 'Corte Profundo+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 3,
+  target: SkillTarget.SINGLE_ENEMY,
+  effects: [
+    { type: 'damage', amount: 12, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'apply_status', statusId: StatusEffectId.BLEED, stacks: 4 },
+  ],
+  description: '12 dano + 4 stacks de Sangrado.',
+  characterId: 'vera',
+};
+
+const veraDanzaAceroPlus: SkillData = {
+  id: 'vera_danza_acero_plus',
+  name: 'Danza de Acero+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 4,
+  target: SkillTarget.RANDOM_ENEMIES,
+  effects: [
+    { type: 'damage', amount: 7, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'damage', amount: 7, scalingStat: 'attack', scalingMultiplier: 1.0 },
+    { type: 'damage', amount: 7, scalingStat: 'attack', scalingMultiplier: 1.0 },
+  ],
+  description: 'Golpea a 3 enemigos al azar por 7 dano cada uno.',
+  characterId: 'vera',
+};
+
 export const veraSkills: SkillData[] = [
   {
     id: 'vera_basic',
@@ -35,6 +82,7 @@ export const veraSkills: SkillData[] = [
     ],
     description: '2 golpes de 5 daño cada uno. Aplica 1 stack de Sangrado.',
     characterId: 'vera',
+    improvedVersion: veraTajoDoblePlus,
   },
   {
     id: 'vera_corte_profundo',
@@ -49,6 +97,7 @@ export const veraSkills: SkillData[] = [
     ],
     description: '10 daño + 3 stacks de Sangrado.',
     characterId: 'vera',
+    improvedVersion: veraCorteProfundoPlus,
   },
   {
     id: 'vera_danza_acero',
@@ -64,6 +113,7 @@ export const veraSkills: SkillData[] = [
     ],
     description: 'Golpea a 3 enemigos al azar por 6 daño cada uno.',
     characterId: 'vera',
+    improvedVersion: veraDanzaAceroPlus,
   },
   {
     id: 'vera_ult_carniceria',

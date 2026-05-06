@@ -6,6 +6,51 @@ import {
   StatusEffectId,
 } from '@/types';
 
+const miraLlamaradaPlus: SkillData = {
+  id: 'mira_llamarada_plus',
+  name: 'Llamarada+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.MANA,
+  costAmount: 2,
+  target: SkillTarget.SINGLE_ENEMY,
+  effects: [
+    { type: 'damage', amount: 11, scalingStat: 'power', scalingMultiplier: 1.0 },
+    { type: 'apply_status', statusId: StatusEffectId.BURN, stacks: 3 },
+  ],
+  description: '11 dano magico a un enemigo + Quemadura (3 stacks).',
+  characterId: 'mira',
+};
+
+const miraTormentaPlus: SkillData = {
+  id: 'mira_tormenta_plus',
+  name: 'Tormenta de Brasas+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.MANA,
+  costAmount: 4,
+  target: SkillTarget.ALL_ENEMIES,
+  effects: [
+    { type: 'damage', amount: 6, scalingStat: 'power', scalingMultiplier: 1.0 },
+    { type: 'apply_status', statusId: StatusEffectId.BURN, stacks: 2 },
+  ],
+  description: '6 dano magico AoE + Quemadura (2 stacks) a todos.',
+  characterId: 'mira',
+};
+
+const miraVeloHumoPlus: SkillData = {
+  id: 'mira_velo_humo_plus',
+  name: 'Velo de Humo+',
+  type: SkillType.ACTIVE,
+  costType: ResourceCost.VIGOR,
+  costAmount: 2,
+  target: SkillTarget.SINGLE_ENEMY,
+  effects: [
+    { type: 'apply_status', statusId: StatusEffectId.VULNERABLE, stacks: 1 },
+    { type: 'apply_status', statusId: StatusEffectId.MARKED, stacks: 1 },
+  ],
+  description: 'Aplica Vulnerable y Marcado a un enemigo.',
+  characterId: 'mira',
+};
+
 export const miraSkills: SkillData[] = [
   {
     id: 'mira_basic',
@@ -35,6 +80,7 @@ export const miraSkills: SkillData[] = [
     ],
     description: '8 daño mágico a un enemigo + Quemadura (2 stacks).',
     characterId: 'mira',
+    improvedVersion: miraLlamaradaPlus,
   },
   {
     id: 'mira_tormenta',
@@ -49,6 +95,7 @@ export const miraSkills: SkillData[] = [
     ],
     description: '5 daño mágico AoE + Quemadura a todos.',
     characterId: 'mira',
+    improvedVersion: miraTormentaPlus,
   },
   {
     id: 'mira_velo_humo',
@@ -62,6 +109,7 @@ export const miraSkills: SkillData[] = [
     ],
     description: 'Aplica Vulnerable (50% más daño recibido) a un enemigo por 2 turnos.',
     characterId: 'mira',
+    improvedVersion: miraVeloHumoPlus,
   },
   {
     id: 'mira_ult_pira',

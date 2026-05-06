@@ -7,7 +7,12 @@
       "Bash(node run.js \"C:\\\\Users\\\\Martín\\\\AppData\\\\Local\\\\Temp\\\\playwright-test-scenes.js\")",
       "Bash(node run.js \"C:\\\\Users\\\\Martín\\\\AppData\\\\Local\\\\Temp\\\\playwright-test-scenes2.js\")",
       "Bash(npx tsc *)",
-      "Bash(node --input-type=module -e \"import\\('./src/data/Registry.ts'\\).then\\(m => { const b = m.registry.getCharacter\\('bram'\\); console.log\\('bram ok:', b.name, 'hp:', b.baseStats.hp, 'speed:', b.baseStats.speed, 'def:', b.baseStats.defense\\); console.log\\('all:', m.registry.getAllCharacters\\(\\).map\\(c => c.id\\)\\); try { m.registry.getCharacter\\('nope'\\); console.log\\('FAIL: should have thrown'\\); } catch \\(e\\) { console.log\\('error ok:', e.message\\); } }\\)\")"
+      "Bash(node --input-type=module -e \"import\\('./src/data/Registry.ts'\\).then\\(m => { const b = m.registry.getCharacter\\('bram'\\); console.log\\('bram ok:', b.name, 'hp:', b.baseStats.hp, 'speed:', b.baseStats.speed, 'def:', b.baseStats.defense\\); console.log\\('all:', m.registry.getAllCharacters\\(\\).map\\(c => c.id\\)\\); try { m.registry.getCharacter\\('nope'\\); console.log\\('FAIL: should have thrown'\\); } catch \\(e\\) { console.log\\('error ok:', e.message\\); } }\\)\")",
+      "Bash(npm run *)",
+      "Bash(not exist *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Proyectos\\\\hollow-banner\\\\src\\\\data\\\\enemies\\\\\" -File)",
+      "Bash(cat)",
+      "Read(//tmp/**)"
     ]
   }
 }

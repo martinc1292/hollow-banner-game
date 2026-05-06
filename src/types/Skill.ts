@@ -48,4 +48,5 @@ export interface SkillData {
   effects: SkillEffect[];
   description: string;
   characterId: string;
+  improvedVersion?: SkillData;
 }

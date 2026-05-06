@@ -4,9 +4,9 @@ export const bandidoHueco: EnemyData = {
   id: 'bandido_hueco',
   name: 'Bandido Hueco',
   baseStats: {
-    hp: 25,
-    hpMax: 25,
-    attack: 6,
+    hp: 30,
+    hpMax: 30,
+    attack: 7,
     power: 0,
     defense: 1,
     speed: 3,

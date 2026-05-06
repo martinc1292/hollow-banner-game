@@ -3,4 +3,7 @@ export * from './Character';
 export * from './StatusEffect';
 export * from './Skill';
 export * from './Item';
+export * from './Set';
 export * from './Enemy';
+export * from './Encounter';
+export * from './Event';

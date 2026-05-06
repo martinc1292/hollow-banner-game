@@ -9,6 +9,8 @@ export interface DamageOptions {
   forceCrit?: boolean;
   /** Some future effects may read Marcado without consuming it. Defaults true. */
   consumeMark?: boolean;
+  /** Multiplicative attack modifier from passives such as Vera's Frenesi. */
+  damageMultiplier?: number;
   /** RNG hook so tests can be deterministic. Returns [0, 100). */
   rng?: () => number;
 }
@@ -59,6 +61,7 @@ export function calculateDamage(
   if (hasStatus(target, StatusEffectId.PROTECTED)) {
     damage *= PROTECTED_MULTIPLIER;
   }
+  damage *= options.damageMultiplier ?? 1;
 
   let wasCrit = false;
   let consumedMark = false;
@@ -80,15 +83,19 @@ export function calculateDamage(
   }
 
   const targetRuntime = ensureBattleRuntime(target);
-  const defense = target.currentStats.defense + targetRuntime.defendBonus;
+  const defense = (
+    target.currentStats.defense
+    + targetRuntime.defendBonus
+    + targetRuntime.bramVotoDefenseBonus
+  );
 
   const incomingDamage = Math.max(1, Math.floor(damage - defense));
   let finalDamage = incomingDamage;
 
   let blocked = 0;
-  if (targetRuntime.block > 0) {
-    blocked = Math.min(targetRuntime.block, finalDamage);
-    targetRuntime.block -= blocked;
+  if (target.block > 0) {
+    blocked = Math.min(target.block, finalDamage);
+    target.block -= blocked;
     finalDamage -= blocked;
   }
 

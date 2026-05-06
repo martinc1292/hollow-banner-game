@@ -42,5 +42,6 @@ export interface CharacterInstance {
   xp: number;
   equipment: CharacterEquipment;
   statusEffects: StatusEffectInstance[];
+  block: number;
   isDown: boolean;
 }
