@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
 import { registry } from '@/data/Registry';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import { gameState } from '@/systems/GameState';
 import {
   completeCurrentMapNode,
@@ -61,41 +63,39 @@ export class ShopScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, 0x151210, 1));
+    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1));
+    this.addViewObject(addVignette(this, width, height));
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x3b3023, 0.32);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 60; x < width; x += 86) {
       grid.lineBetween(x, 106, x, height - 56);
     }
     for (let y = 126; y < height - 52; y += 58) {
       grid.lineBetween(42, y, width - 42, y);
     }
-    grid.lineStyle(2, 0x805f30, 0.45);
-    grid.lineBetween(42, 96, width - 42, 96);
     this.addViewObject(grid);
+    this.addViewObject(drawSeparator(this, 42, 96, width - 84, THEME.accent, 0.4));
   }
 
   private renderHeader(): void {
     const { width } = this.scale;
 
-    this.addViewObject(this.add.text(42, 25, 'Tienda del Acto 1', {
-      fontSize: '36px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-    }));
+    this.addViewObject(this.add.text(width / 2, 36, 'TIENDA', {
+      ...THEME.fonts.heading,
+      fontSize: '32px',
+    }).setOrigin(0.5, 0));
 
-    this.addViewObject(this.add.text(44, 66, 'Compra equipo, consumibles o quita una reliquia maldita.', {
+    this.addViewObject(this.add.text(width / 2, 68, 'Equipo, consumibles y servicios del camino.', {
+      ...THEME.fonts.dialogue,
       fontSize: '15px',
-      color: '#a7977e',
-      fontFamily: 'Georgia, serif',
-    }));
+      color: THEME.textDim,
+    }).setOrigin(0.5, 0));
 
-    this.addViewObject(this.add.text(width - 44, 30, `Oro ${gameState.runMeta.gold}`, {
-      fontSize: '22px',
-      color: '#f0d37a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(width - 44, 30, `ORO: ${gameState.runMeta.gold}`, {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
+      letterSpacing: 2,
     }).setOrigin(1, 0));
   }
 
@@ -112,47 +112,42 @@ export class ShopScene extends Phaser.Scene {
   private renderOfferCard(offer: ShopOffer, x: number, y: number): void {
     const canBuy = !offer.sold && gameState.runMeta.gold >= offer.price;
     const accent = itemRarityColor(offer.item.rarity);
-    const bgColor = offer.sold ? 0x191714 : 0x231d17;
-    const strokeColor = offer.sold ? 0x5b554b : canBuy ? accent : 0x6b4a42;
+    const borderColor = offer.sold ? THEME.accentDeep : canBuy ? accent : 0x6b4a42;
 
-    const card = this.add.rectangle(x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT, bgColor, 0.98)
-      .setOrigin(0, 0)
-      .setStrokeStyle(canBuy ? 2 : 1, strokeColor, offer.sold ? 0.48 : 0.9);
-    const strip = this.add.rectangle(x, y, SHOP_CARD_WIDTH, 7, accent, offer.sold ? 0.3 : 0.9)
-      .setOrigin(0, 0);
-    const title = this.add.text(x + 16, y + 24, offer.item.name, {
-      fontSize: '20px',
-      color: offer.sold ? '#777064' : '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const cardGfx = this.add.graphics();
+    cardGfx.fillStyle(THEME.bgPanel, offer.sold ? 0.8 : 0.97);
+    cardGfx.fillRect(x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT);
+    drawCornerBox(cardGfx, x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT, 10, borderColor, offer.sold ? 0.3 : 0.85);
+
+    const strip = this.add.rectangle(x, y, SHOP_CARD_WIDTH, 5, accent, offer.sold ? 0.2 : 0.85).setOrigin(0, 0);
+    const title = this.add.text(x + 16, y + 22, offer.item.name.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
+      color: offer.sold ? THEME.textDim : THEME.textPrimary,
       wordWrap: { width: SHOP_CARD_WIDTH - 32, useAdvancedWrap: true },
     });
-    const meta = this.add.text(x + 16, y + 74, `${this.categoryLabel(offer.item)} / ${itemRarityLabel(offer.item.rarity)}`, {
-      fontSize: '12px',
-      color: offer.sold ? '#6a6358' : '#ad9b82',
-      fontFamily: 'Georgia, serif',
+    const meta = this.add.text(x + 16, y + 66, `${this.categoryLabel(offer.item).toUpperCase()} / ${itemRarityLabel(offer.item.rarity).toUpperCase()}`, {
+      ...THEME.fonts.hudSmall,
+      fontSize: '11px',
+      color: offer.sold ? THEME.textDim : THEME.textDim,
     });
-    const body = this.add.text(x + 16, y + 98, offer.item.description, {
+    const body = this.add.text(x + 16, y + 90, offer.item.description, {
+      ...THEME.fonts.body,
       fontSize: '13px',
-      color: offer.sold ? '#6f695f' : '#c6b89f',
-      fontFamily: 'Georgia, serif',
+      color: offer.sold ? THEME.textDim : THEME.textPrimary,
       lineSpacing: 4,
       wordWrap: { width: SHOP_CARD_WIDTH - 32, useAdvancedWrap: true },
     });
-    const price = this.add.text(x + 16, y + SHOP_CARD_HEIGHT - 34, offer.sold ? 'Vendido' : `${offer.price}g`, {
-      fontSize: '17px',
-      color: offer.sold ? '#777064' : canBuy ? '#f0d37a' : '#c96363',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const price = this.add.text(x + 16, y + SHOP_CARD_HEIGHT - 34, offer.sold ? 'VENDIDO' : `${offer.price}g`, {
+      ...THEME.fonts.hudSmall,
+      color: offer.sold ? THEME.textDim : canBuy ? THEME.accentHex : '#c96363',
     });
-    const action = this.add.text(x + SHOP_CARD_WIDTH - 16, y + SHOP_CARD_HEIGHT - 34, 'Comprar', {
-      fontSize: '15px',
-      color: canBuy ? '#e8ca79' : '#625b51',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const action = this.add.text(x + SHOP_CARD_WIDTH - 16, y + SHOP_CARD_HEIGHT - 34, 'COMPRAR', {
+      ...THEME.fonts.hudSmall,
+      color: canBuy ? THEME.accentHex : THEME.textDim,
     }).setOrigin(1, 0);
 
-    this.addViewObject(card);
+    this.addViewObject(cardGfx);
     this.addViewObject(strip);
     this.addViewObject(title);
     this.addViewObject(meta);
@@ -161,16 +156,25 @@ export class ShopScene extends Phaser.Scene {
     this.addViewObject(action);
 
     if (!offer.sold) {
-      card.setInteractive({ useHandCursor: true });
-      card.on('pointerover', () => {
-        card.setStrokeStyle(3, canBuy ? accent : 0xc96363, 1);
-        if (canBuy) action.setColor('#fff0ad');
+      cardGfx.setInteractive(
+        new Phaser.Geom.Rectangle(x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT),
+        Phaser.Geom.Rectangle.Contains,
+      );
+      cardGfx.on('pointerover', () => {
+        cardGfx.clear();
+        cardGfx.fillStyle(THEME.bgPanel, 0.97);
+        cardGfx.fillRect(x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT);
+        drawCornerBox(cardGfx, x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT, 10, canBuy ? accent : 0xc96363, 1);
+        if (canBuy) action.setColor('#ffffff');
       });
-      card.on('pointerout', () => {
-        card.setStrokeStyle(canBuy ? 2 : 1, strokeColor, 0.9);
-        action.setColor(canBuy ? '#e8ca79' : '#625b51');
+      cardGfx.on('pointerout', () => {
+        cardGfx.clear();
+        cardGfx.fillStyle(THEME.bgPanel, 0.97);
+        cardGfx.fillRect(x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT);
+        drawCornerBox(cardGfx, x, y, SHOP_CARD_WIDTH, SHOP_CARD_HEIGHT, 10, borderColor, 0.85);
+        action.setColor(canBuy ? THEME.accentHex : THEME.textDim);
       });
-      card.on('pointerdown', () => this.buyOffer(offer.offerId));
+      cardGfx.on('pointerdown', () => this.buyOffer(offer.offerId));
     }
   }
 
@@ -182,50 +186,63 @@ export class ShopScene extends Phaser.Scene {
     const available = Boolean(cursedRelic) && !this.serviceUsed;
     const affordable = gameState.runMeta.gold >= CURSE_SERVICE_PRICE;
     const canUse = available && affordable;
+    const borderColor = canUse ? 0xc55f65 : THEME.accentDeep;
 
-    const bg = this.add.rectangle(x, y, width, 96, available ? 0x201815 : 0x171513, 0.98)
-      .setOrigin(0, 0)
-      .setStrokeStyle(canUse ? 2 : 1, canUse ? 0xc55f65 : 0x5b5147, canUse ? 0.9 : 0.6);
-    const title = this.add.text(x + 20, y + 18, 'Servicio: Quitar reliquia maldita', {
-      fontSize: '20px',
-      color: available ? '#f0e4c8' : '#827a6d',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const bgGfx = this.add.graphics();
+    bgGfx.fillStyle(THEME.bgPanel, available ? 0.97 : 0.8);
+    bgGfx.fillRect(x, y, width, 96);
+    drawCornerBox(bgGfx, x, y, width, 96, 10, borderColor, canUse ? 0.85 : 0.4);
+
+    const title = this.add.text(x + 20, y + 16, 'SERVICIO: QUITAR RELIQUIA MALDITA', {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
+      color: available ? THEME.textPrimary : THEME.textDim,
     });
     const bodyText = cursedRelic
       ? `${cursedRelic.name} sera removida de la run.`
       : 'No hay reliquias malditas activas.';
-    const body = this.add.text(x + 20, y + 50, bodyText, {
-      fontSize: '14px',
-      color: available ? '#bba992' : '#6f675d',
-      fontFamily: 'Georgia, serif',
+    const body = this.add.text(x + 20, y + 46, bodyText, {
+      ...THEME.fonts.body,
+      fontSize: '13px',
+      color: available ? THEME.textPrimary : THEME.textDim,
     });
     const action = this.add.text(x + width - 22, y + 34, `${CURSE_SERVICE_PRICE}g`, {
-      fontSize: '18px',
-      color: canUse ? '#f0d37a' : '#625b51',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+      ...THEME.fonts.hud,
+      color: canUse ? THEME.accentHex : THEME.textDim,
     }).setOrigin(1, 0);
 
-    this.addViewObject(bg);
+    this.addViewObject(bgGfx);
     this.addViewObject(title);
     this.addViewObject(body);
     this.addViewObject(action);
 
     if (!available) return;
 
-    bg.setInteractive({ useHandCursor: true });
-    bg.on('pointerover', () => bg.setStrokeStyle(3, canUse ? 0xc55f65 : 0x7b504f, 1));
-    bg.on('pointerout', () => bg.setStrokeStyle(canUse ? 2 : 1, canUse ? 0xc55f65 : 0x5b5147, 0.9));
-    bg.on('pointerdown', () => this.removeCursedRelic());
+    bgGfx.setInteractive(
+      new Phaser.Geom.Rectangle(x, y, width, 96),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    bgGfx.on('pointerover', () => {
+      bgGfx.clear();
+      bgGfx.fillStyle(THEME.bgPanel, 0.97);
+      bgGfx.fillRect(x, y, width, 96);
+      drawCornerBox(bgGfx, x, y, width, 96, 10, canUse ? 0xc55f65 : 0x7b504f, 1);
+    });
+    bgGfx.on('pointerout', () => {
+      bgGfx.clear();
+      bgGfx.fillStyle(THEME.bgPanel, 0.97);
+      bgGfx.fillRect(x, y, width, 96);
+      drawCornerBox(bgGfx, x, y, width, 96, 10, borderColor, 0.85);
+    });
+    bgGfx.on('pointerdown', () => this.removeCursedRelic());
   }
 
   private renderExit(): void {
-    const button = this.createActionText(this.scale.width / 2, 642, 'Salir', () => {
+    const button = this.createActionText(this.scale.width / 2, 642, 'SALIR', () => {
       completeCurrentMapNode();
       saveManager.save();
       this.scene.start(SceneKeys.MAP);
-    }, 24, '#d5c7a7');
+    }, 16, THEME.textPrimary);
     this.addViewObject(button);
   }
 
@@ -341,14 +358,13 @@ export class ShopScene extends Phaser.Scene {
     color: string,
   ): Phaser.GameObjects.Text {
     const text = this.add.text(x, y, label, {
+      ...THEME.fonts.hudSmall,
       fontSize: `${fontSize}px`,
       color,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     text.setData('baseColor', color);
-    text.on('pointerover', () => text.setColor('#fff0ad'));
+    text.on('pointerover', () => text.setColor('#ffffff'));
     text.on('pointerout', () => text.setColor(text.getData('baseColor') as string));
     text.on('pointerdown', onClick);
     return text;
@@ -357,13 +373,12 @@ export class ShopScene extends Phaser.Scene {
   private showToast(message: string): void {
     this.clearToast();
 
-    const bg = this.add.rectangle(this.scale.width / 2, 590, 520, 42, 0x241b16, 0.98)
-      .setStrokeStyle(1, 0xd1ad63, 0.82)
+    const bg = this.add.rectangle(this.scale.width / 2, 590, 520, 42, THEME.bgPanel, 0.98)
+      .setStrokeStyle(1, THEME.accent, 0.7)
       .setDepth(900);
     const text = this.add.text(this.scale.width / 2, 590, message, {
-      fontSize: '16px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hud,
+      fontSize: '14px',
     }).setOrigin(0.5).setDepth(901);
 
     this.toastObjects.push(bg, text);

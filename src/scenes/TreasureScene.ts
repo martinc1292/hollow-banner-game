@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import {
   addRolledItem,
   addStatusToParty,
@@ -39,10 +41,11 @@ export class TreasureScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, 0x12100f, 1));
+    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1));
+    this.addViewObject(addVignette(this, width, height));
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x31271e, 0.32);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 56; x < width; x += 82) {
       grid.lineBetween(x, 108, x, height - 58);
     }
@@ -50,20 +53,21 @@ export class TreasureScene extends Phaser.Scene {
       grid.lineBetween(46, y, width - 46, y);
     }
     this.addViewObject(grid);
+    this.addViewObject(drawSeparator(this, 42, 104, width - 84, THEME.accent, 0.4));
   }
 
   private renderHeader(): void {
-    this.addViewObject(this.add.text(42, 25, 'Tesoro', {
-      fontSize: '38px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-    }));
+    const { width } = this.scale;
+    this.addViewObject(this.add.text(width / 2, 30, 'TESORO', {
+      ...THEME.fonts.heading,
+      fontSize: '32px',
+    }).setOrigin(0.5, 0));
 
-    this.addViewObject(this.add.text(44, 68, 'Un cofre sellado en hierro negro. Puede ser botin o castigo.', {
+    this.addViewObject(this.add.text(width / 2, 66, 'Un cofre sellado en hierro negro. Puede ser botin o castigo.', {
+      ...THEME.fonts.dialogue,
       fontSize: '15px',
-      color: '#a7977e',
-      fontFamily: 'Georgia, serif',
-    }));
+      color: THEME.textDim,
+    }).setOrigin(0.5, 0));
   }
 
   private renderChest(): void {
@@ -95,7 +99,7 @@ export class TreasureScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    const open = this.createActionText(x, y + 178, 'Abrir', () => this.openChest(), 26, '#f0d37a');
+    const open = this.createActionText(x, y + 178, 'ABRIR', () => this.openChest(), 18, THEME.accentHex);
     this.addViewObject(open);
   }
 
@@ -130,25 +134,28 @@ export class TreasureScene extends Phaser.Scene {
 
   private showResult(title: string, body: string, item: ItemData): void {
     const { width } = this.scale;
-    const panel = this.add.rectangle(width / 2, 570, 680, 92, 0x201812, 0.98)
-      .setStrokeStyle(2, itemRarityColor(item.rarity), 0.9)
-      .setDepth(800);
-    const titleText = this.add.text(width / 2, 542, title, {
-      fontSize: '22px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const pw = 680, ph = 92;
+    const px = width / 2 - pw / 2;
+    const py = 528;
+    const panelGfx = this.add.graphics().setDepth(800);
+    panelGfx.fillStyle(THEME.bgPanel, 0.98);
+    panelGfx.fillRect(px, py, pw, ph);
+    drawCornerBox(panelGfx, px, py, pw, ph, 12, itemRarityColor(item.rarity), 0.9);
+
+    const titleText = this.add.text(width / 2, 544, title.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '16px',
     }).setOrigin(0.5).setDepth(801);
-    const bodyText = this.add.text(width / 2, 574, body, {
-      fontSize: '15px',
-      color: '#cbbda1',
-      fontFamily: 'Georgia, serif',
+    const bodyText = this.add.text(width / 2, 572, body, {
+      ...THEME.fonts.body,
+      fontSize: '14px',
+      color: THEME.textPrimary,
       align: 'center',
       lineSpacing: 4,
       wordWrap: { width: 620, useAdvancedWrap: true },
     }).setOrigin(0.5).setDepth(801);
 
-    this.addViewObject(panel);
+    this.addViewObject(panelGfx);
     this.addViewObject(titleText);
     this.addViewObject(bodyText);
   }
@@ -162,14 +169,13 @@ export class TreasureScene extends Phaser.Scene {
     color: string,
   ): Phaser.GameObjects.Text {
     const text = this.add.text(x, y, label, {
+      ...THEME.fonts.hudSmall,
       fontSize: `${fontSize}px`,
       color,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     text.setData('baseColor', color);
-    text.on('pointerover', () => text.setColor('#fff0ad'));
+    text.on('pointerover', () => text.setColor('#ffffff'));
     text.on('pointerout', () => text.setColor(text.getData('baseColor') as string));
     text.on('pointerdown', onClick);
     return text;

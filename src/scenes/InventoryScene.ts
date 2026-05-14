@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { SceneKeys, type SceneKey } from '@/config/SceneKeys';
 import { registry } from '@/data/Registry';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import { gameState } from '@/systems/GameState';
 import {
   canEquip,
@@ -160,46 +162,43 @@ export class InventoryScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, 0x101617, 1));
+    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1));
+    this.addViewObject(addVignette(this, width, height));
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x2c3a3e, 0.22);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 48; x < width; x += 78) {
       grid.lineBetween(x, 92, x, height - 48);
     }
     for (let y = 112; y < height - 52; y += 56) {
       grid.lineBetween(38, y, width - 38, y);
     }
-    grid.lineStyle(2, 0x6d473e, 0.34);
-    grid.lineBetween(42, 92, width - 42, 92);
     this.addViewObject(grid);
+    this.addViewObject(drawSeparator(this, 0, 92, width, THEME.accent, 0.3));
   }
 
   private renderHeader(): void {
     const { width } = this.scale;
 
-    this.addViewObject(this.add.text(42, 26, 'Inventario', {
-      fontSize: '36px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    this.addViewObject(this.add.text(42, 22, 'INVENTARIO', {
+      ...THEME.fonts.heading,
+      fontSize: '28px',
     }));
 
-    this.addViewObject(this.add.text(44, 66, this.headerStatus(), {
-      fontSize: '15px',
-      color: '#9fb0ad',
-      fontFamily: 'Georgia, serif',
+    this.addViewObject(this.add.text(44, 60, this.headerStatus(), {
+      ...THEME.fonts.hudSmall,
+      color: THEME.textDim,
     }));
 
-    this.addViewObject(this.add.text(width - 44, 30, `Oro ${gameState.runMeta.gold}`, {
-      fontSize: '18px',
-      color: '#f0d37a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(width - 44, 28, `ORO: ${gameState.runMeta.gold}`, {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
+      letterSpacing: 2,
     }).setOrigin(1, 0));
 
-    const back = this.createActionText(width - 116, 68, 'Volver', () => {
+    const back = this.createActionText(width - 116, 64, 'VOLVER', () => {
       this.scene.start(this.returnScene);
-    }, 20, '#d5c7a7');
+    }, 14, THEME.textDim);
     this.addViewObject(back);
   }
 
@@ -221,23 +220,15 @@ export class InventoryScene extends Phaser.Scene {
   }
 
   private renderPartyPanel(): void {
-    const panel = this.add.rectangle(
-      PARTY_PANEL.x,
-      PARTY_PANEL.y,
-      PARTY_PANEL.width,
-      PARTY_PANEL.height,
-      0x172023,
-      0.96,
-    )
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x5c6c67, 0.72);
-    this.addViewObject(panel);
+    const panelGfx = this.add.graphics();
+    panelGfx.fillStyle(THEME.bgPanel, 0.95);
+    panelGfx.fillRect(PARTY_PANEL.x, PARTY_PANEL.y, PARTY_PANEL.width, PARTY_PANEL.height);
+    drawCornerBox(panelGfx, PARTY_PANEL.x, PARTY_PANEL.y, PARTY_PANEL.width, PARTY_PANEL.height, 12, THEME.accentDim, 0.6);
+    this.addViewObject(panelGfx);
 
-    this.addViewObject(this.add.text(PARTY_PANEL.x + 18, PARTY_PANEL.y + 16, 'Party', {
-      fontSize: '18px',
-      color: '#e6d8b8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(PARTY_PANEL.x + 18, PARTY_PANEL.y + 14, 'PARTY', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }));
 
     const cardHeight = 108;
@@ -336,25 +327,21 @@ export class InventoryScene extends Phaser.Scene {
     container: Phaser.GameObjects.Container,
     character: CharacterInstance,
   ): void {
-    container.add(this.add.text(86, 20, this.shortName(character.data.name), {
-      fontSize: '19px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    container.add(this.add.text(86, 20, this.shortName(character.data.name).toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
       fixedWidth: 98,
     }));
 
-    container.add(this.add.text(86, 48, CLASS_LABELS[character.data.className], {
-      fontSize: '12px',
-      color: '#9fb0ad',
-      fontFamily: 'Georgia, serif',
+    container.add(this.add.text(86, 46, CLASS_LABELS[character.data.className].toUpperCase(), {
+      ...THEME.fonts.hudSmall,
+      color: THEME.textDim,
       fixedWidth: 98,
     }));
 
-    container.add(this.add.text(86, 68, this.resourceLine(character), {
-      fontSize: '12px',
-      color: '#d5c07f',
-      fontFamily: 'Georgia, serif',
+    container.add(this.add.text(86, 66, this.resourceLine(character), {
+      ...THEME.fonts.hudSmall,
+      color: THEME.vigorHex,
       fixedWidth: 98,
     }));
   }
@@ -382,13 +369,12 @@ export class InventoryScene extends Phaser.Scene {
       const row = Math.floor(index / 3);
       const boxX = x + col * (boxWidth + gap);
       const boxY = y + row * (boxHeight + 8);
-      const box = this.add.rectangle(boxX, boxY, boxWidth, boxHeight, 0x101617, 0.88)
+      const box = this.add.rectangle(boxX, boxY, boxWidth, boxHeight, THEME.bgDeep, 0.88)
         .setOrigin(0, 0)
-        .setStrokeStyle(1, 0x334345, 0.8);
+        .setStrokeStyle(1, THEME.accentDeep, 0.8);
       const text = this.add.text(boxX + boxWidth / 2, boxY + boxHeight / 2, `${label} ${value}`, {
+        ...THEME.fonts.hudSmall,
         fontSize: '11px',
-        color: '#dfd4bc',
-        fontFamily: 'Georgia, serif',
       }).setOrigin(0.5);
       container.add([box, text]);
     });
@@ -416,25 +402,25 @@ export class InventoryScene extends Phaser.Scene {
     const itemId = character.equipment[slot];
     const item = itemId ? registry.getItem(itemId) : null;
     const width = 206;
-    const bg = this.add.rectangle(x, y, width, 23, item ? 0x202a2c : 0x11181a, 0.96)
+    const bg = this.add.rectangle(x, y, width, 23, item ? THEME.bgPanel : THEME.bgDeep, 0.96)
       .setOrigin(0, 0)
-      .setStrokeStyle(1, item ? RARITY_COLORS[item.rarity] : 0x354245, item ? 0.84 : 0.58);
-    const label = this.add.text(x + 8, y + 5, SLOT_LABELS[slot], {
-      fontSize: '11px',
-      color: '#9fb0ad',
-      fontFamily: 'Georgia, serif',
+      .setStrokeStyle(1, item ? RARITY_COLORS[item.rarity] : THEME.accentDeep, item ? 0.84 : 0.58);
+    const label = this.add.text(x + 8, y + 5, SLOT_LABELS[slot].toUpperCase(), {
+      ...THEME.fonts.hudSmall,
+      fontSize: '10px',
+      color: THEME.textDim,
       fixedWidth: 54,
     });
     const itemName = this.add.text(x + 68, y + 5, item ? this.truncate(item.name, 17) : 'Vacio', {
-      fontSize: '11px',
-      color: item ? '#f0e4c8' : '#667474',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hudSmall,
+      fontSize: '10px',
+      color: item ? THEME.textPrimary : THEME.textDim,
       fixedWidth: 96,
     });
-    const remove = this.add.text(x + width - 8, y + 5, item ? 'Quitar' : '', {
-      fontSize: '11px',
-      color: '#d7b36a',
-      fontFamily: 'Georgia, serif',
+    const remove = this.add.text(x + width - 8, y + 5, item ? 'QUITAR' : '', {
+      ...THEME.fonts.hudSmall,
+      fontSize: '10px',
+      color: THEME.accentHex,
     }).setOrigin(1, 0);
 
     container.add([bg, label, itemName, remove]);
@@ -476,19 +462,18 @@ export class InventoryScene extends Phaser.Scene {
       activeSet.set.bonuses.length > 0 || activeSet.piecesEquipped > 0
     ));
 
-    const label = this.add.text(x, y + 3, 'Sets', {
-      fontSize: '11px',
-      color: '#9fb0ad',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const label = this.add.text(x, y + 3, 'SETS', {
+      ...THEME.fonts.hudSmall,
+      fontSize: '10px',
+      color: THEME.textDim,
     });
     container.add(label);
 
     if (visibleSets.length === 0) {
       const empty = this.add.text(x + 40, y + 3, '-', {
-        fontSize: '11px',
-        color: '#667474',
-        fontFamily: 'Georgia, serif',
+        ...THEME.fonts.hudSmall,
+        fontSize: '10px',
+        color: THEME.textDim,
       });
       container.add(empty);
       return;
@@ -503,16 +488,16 @@ export class InventoryScene extends Phaser.Scene {
         y,
         chipWidth,
         20,
-        bonusActive ? 0x233322 : 0x142024,
+        bonusActive ? 0x233322 : THEME.bgDeep,
         0.96,
       )
         .setOrigin(0, 0)
-        .setStrokeStyle(1, bonusActive ? 0x82d083 : 0x536467, bonusActive ? 0.96 : 0.78)
+        .setStrokeStyle(1, bonusActive ? 0x82d083 : THEME.accentDeep, bonusActive ? 0.96 : 0.78)
         .setInteractive({ useHandCursor: true });
       const text = this.add.text(chipX + 7, y + 4, this.setChipLabel(activeSet), {
+        ...THEME.fonts.hudSmall,
         fontSize: '10px',
-        color: bonusActive ? '#d8f0c6' : '#b8c4bd',
-        fontFamily: 'Georgia, serif',
+        color: bonusActive ? '#d8f0c6' : THEME.textPrimary,
         fixedWidth: chipWidth - 14,
       });
 
@@ -533,31 +518,23 @@ export class InventoryScene extends Phaser.Scene {
   }
 
   private renderInventoryPanel(): void {
-    const panel = this.add.rectangle(
-      INVENTORY_PANEL.x,
-      INVENTORY_PANEL.y,
-      INVENTORY_PANEL.width,
-      INVENTORY_PANEL.height,
-      0x161d20,
-      0.97,
-    )
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x5c6c67, 0.72);
-    this.addViewObject(panel);
+    const panelGfx = this.add.graphics();
+    panelGfx.fillStyle(THEME.bgPanel, 0.95);
+    panelGfx.fillRect(INVENTORY_PANEL.x, INVENTORY_PANEL.y, INVENTORY_PANEL.width, INVENTORY_PANEL.height);
+    drawCornerBox(panelGfx, INVENTORY_PANEL.x, INVENTORY_PANEL.y, INVENTORY_PANEL.width, INVENTORY_PANEL.height, 12, THEME.accentDim, 0.6);
+    this.addViewObject(panelGfx);
 
-    this.addViewObject(this.add.text(INVENTORY_PANEL.x + 18, INVENTORY_PANEL.y + 16, 'Mochila', {
-      fontSize: '18px',
-      color: '#e6d8b8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(INVENTORY_PANEL.x + 18, INVENTORY_PANEL.y + 14, 'MOCHILA', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }));
 
     const entries = this.inventoryEntries();
     if (entries.length === 0) {
       this.addViewObject(this.add.text(INVENTORY_PANEL.x + 24, INVENTORY_PANEL.y + 72, 'Sin items en la mochila.', {
-        fontSize: '15px',
-        color: '#879493',
-        fontFamily: 'Georgia, serif',
+        ...THEME.fonts.body,
+        fontSize: '14px',
+        color: THEME.textDim,
       }));
       this.renderSelectedItemDetails(null);
       return;
@@ -582,39 +559,34 @@ export class InventoryScene extends Phaser.Scene {
     height: number,
   ): void {
     const selected = entry.item.id === this.selectedItemId;
-    const bg = this.add.rectangle(x, y, width, height, selected ? 0x253233 : 0x101617, 0.98)
+    const bg = this.add.rectangle(x, y, width, height, selected ? 0x1a1428 : THEME.bgDeep, 0.98)
       .setOrigin(0, 0)
-      .setStrokeStyle(selected ? 2 : 1, selected ? 0xe2c06f : 0x354245, selected ? 0.96 : 0.72)
+      .setStrokeStyle(selected ? 2 : 1, selected ? THEME.accent : THEME.accentDeep, selected ? 0.9 : 0.6)
       .setInteractive({ useHandCursor: true });
     const rarity = this.add.rectangle(x, y, 5, height, RARITY_COLORS[entry.item.rarity], 0.92)
       .setOrigin(0, 0);
-    const name = this.add.text(x + 13, y + 6, this.truncate(entry.item.name, 28), {
-      fontSize: '14px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const name = this.add.text(x + 13, y + 6, this.truncate(entry.item.name, 28).toUpperCase(), {
+      ...THEME.fonts.hudSmall,
       fixedWidth: width - 64,
     });
     const count = this.add.text(x + width - 10, y + 6, entry.count > 1 ? `x${entry.count}` : '', {
-      fontSize: '13px',
-      color: '#d7b36a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
     }).setOrigin(1, 0);
     const meta = this.add.text(x + 13, y + 25, this.itemMeta(entry.item), {
+      ...THEME.fonts.body,
       fontSize: '11px',
-      color: '#9fb0ad',
-      fontFamily: 'Georgia, serif',
+      color: THEME.textDim,
       fixedWidth: width - 26,
     });
 
     bg.on('pointerover', () => {
       bg.setStrokeStyle(2, RARITY_COLORS[entry.item.rarity], 0.95);
-      name.setColor('#fff3ce');
+      name.setColor('#ffffff');
     });
     bg.on('pointerout', () => {
-      bg.setStrokeStyle(selected ? 2 : 1, selected ? 0xe2c06f : 0x354245, selected ? 0.96 : 0.72);
-      name.setColor('#f0e4c8');
+      bg.setStrokeStyle(selected ? 2 : 1, selected ? THEME.accent : THEME.accentDeep, selected ? 0.9 : 0.6);
+      name.setColor(THEME.textPrimary);
     });
     bg.on('pointerdown', () => {
       this.selectedItemId = entry.item.id;
@@ -634,18 +606,18 @@ export class InventoryScene extends Phaser.Scene {
     if (pages <= 1) return;
 
     const y = INVENTORY_PANEL.y + 410;
-    const previous = this.createActionText(INVENTORY_PANEL.x + 88, y, 'Anterior', () => {
+    const previous = this.createActionText(INVENTORY_PANEL.x + 88, y, 'ANTERIOR', () => {
       this.inventoryPage = Math.max(0, this.inventoryPage - 1);
       this.render();
-    }, 14, this.inventoryPage > 0 ? '#d5c7a7' : '#596462');
-    const next = this.createActionText(INVENTORY_PANEL.x + INVENTORY_PANEL.width - 88, y, 'Siguiente', () => {
+    }, 12, this.inventoryPage > 0 ? THEME.textPrimary : THEME.textDim);
+    const next = this.createActionText(INVENTORY_PANEL.x + INVENTORY_PANEL.width - 88, y, 'SIGUIENTE', () => {
       this.inventoryPage = Math.min(pages - 1, this.inventoryPage + 1);
       this.render();
-    }, 14, this.inventoryPage < pages - 1 ? '#d5c7a7' : '#596462');
+    }, 12, this.inventoryPage < pages - 1 ? THEME.textPrimary : THEME.textDim);
     const page = this.add.text(INVENTORY_PANEL.x + INVENTORY_PANEL.width / 2, y - 8, `${this.inventoryPage + 1}/${pages}`, {
-      fontSize: '13px',
-      color: '#879493',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hudSmall,
+      fontSize: '12px',
+      color: THEME.textDim,
     }).setOrigin(0.5, 0);
 
     if (this.inventoryPage <= 0) previous.disableInteractive();
@@ -661,39 +633,37 @@ export class InventoryScene extends Phaser.Scene {
     const y = INVENTORY_PANEL.y + 424;
     const width = INVENTORY_PANEL.width - 32;
     const height = 92;
-    const bg = this.add.rectangle(x, y, width, height, 0x101617, 0.94)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x354245, 0.78);
-    this.addViewObject(bg);
+    const bgGfx = this.add.graphics();
+    bgGfx.fillStyle(THEME.bgPanel, 0.96);
+    bgGfx.fillRect(x, y, width, height);
+    drawCornerBox(bgGfx, x, y, width, height, 8, THEME.accentDim, 0.5);
+    this.addViewObject(bgGfx);
 
     if (!item) {
-      this.addViewObject(this.add.text(x + 14, y + 14, 'Selecciona un item.', {
+      this.addViewObject(this.add.text(x + 14, y + 28, 'Selecciona un item.', {
+        ...THEME.fonts.body,
         fontSize: '14px',
-        color: '#879493',
-        fontFamily: 'Georgia, serif',
+        color: THEME.textDim,
       }));
       return;
     }
 
-    this.addViewObject(this.add.text(x + 14, y + 12, item.name, {
-      fontSize: '16px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(x + 14, y + 12, item.name.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '13px',
       fixedWidth: width - 118,
     }));
 
-    this.addViewObject(this.add.text(x + width - 14, y + 13, RARITY_LABELS[item.rarity], {
-      fontSize: '12px',
+    this.addViewObject(this.add.text(x + width - 14, y + 13, RARITY_LABELS[item.rarity].toUpperCase(), {
+      ...THEME.fonts.hudSmall,
+      fontSize: '11px',
       color: this.colorString(RARITY_COLORS[item.rarity]),
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(1, 0));
 
-    this.addViewObject(this.add.text(x + 14, y + 35, this.detailsText(item), {
+    this.addViewObject(this.add.text(x + 14, y + 34, this.detailsText(item), {
+      ...THEME.fonts.body,
       fontSize: '12px',
-      color: '#b8c4bd',
-      fontFamily: 'Georgia, serif',
+      color: THEME.textPrimary,
       lineSpacing: 3,
       wordWrap: { width: width - 28, useAdvancedWrap: true },
     }));
@@ -703,7 +673,7 @@ export class InventoryScene extends Phaser.Scene {
       const useButton = this.createActionText(
         x + width - 42,
         y + height - 18,
-        'Usar',
+        'USAR',
         () => {
           if (!canUse) {
             this.showToast(this.inCombat ? 'No disponible en combate.' : 'Ya no esta en la mochila.');
@@ -712,8 +682,8 @@ export class InventoryScene extends Phaser.Scene {
           this.targetingConsumableId = item.id;
           this.render();
         },
-        14,
-        canUse ? '#f0d37a' : '#596462',
+        12,
+        canUse ? THEME.accentHex : THEME.textDim,
       );
       if (!canUse) useButton.disableInteractive();
       this.addViewObject(useButton);
@@ -1019,9 +989,9 @@ export class InventoryScene extends Phaser.Scene {
       .setStrokeStyle(1, stroke, 0.9)
       .setDepth(1000);
     const label = this.add.text(x + 10, y + 9, text, {
+      ...THEME.fonts.body,
       fontSize: '12px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      color: THEME.textPrimary,
       lineSpacing: 3,
       wordWrap: { width: width - 20, useAdvancedWrap: true },
     }).setDepth(1001);
@@ -1042,13 +1012,12 @@ export class InventoryScene extends Phaser.Scene {
     this.toastObjects = [];
 
     const { width } = this.scale;
-    const bg = this.add.rectangle(width / 2, 672, 620, 42, 0x11181a, 0.98)
-      .setStrokeStyle(1, 0xd1ad63, 0.82)
+    const bg = this.add.rectangle(width / 2, 672, 620, 42, THEME.bgPanel, 0.98)
+      .setStrokeStyle(1, THEME.accent, 0.7)
       .setDepth(900);
     const text = this.add.text(width / 2, 672, message, {
-      fontSize: '15px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hud,
+      fontSize: '14px',
     }).setOrigin(0.5).setDepth(901);
 
     this.toastObjects.push(bg, text);
@@ -1079,15 +1048,14 @@ export class InventoryScene extends Phaser.Scene {
     color: string,
   ): Phaser.GameObjects.Text {
     const text = this.add.text(x, y, label, {
+      ...THEME.fonts.hudSmall,
       fontSize: `${fontSize}px`,
       color,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     text.setData('baseColor', color);
     text.on('pointerover', () => {
-      if (text.input?.enabled) text.setColor('#fff0ad');
+      if (text.input?.enabled) text.setColor('#ffffff');
     });
     text.on('pointerout', () => {
       text.setColor(text.getData('baseColor') as string);

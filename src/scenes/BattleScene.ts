@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
 import { makeTextButton } from '@/ui/TextButton';
 import { registry } from '@/data/Registry';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import { gameState } from '@/systems/GameState';
 import { saveManager } from '@/systems/SaveManager';
 import { soundManager } from '@/systems/SoundManager';
@@ -233,20 +235,21 @@ export class BattleScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0e0c0a);
+    this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep);
+
+    addVignette(this, width, height);
 
     // Subtle grid
     const gfx = this.add.graphics();
-    gfx.lineStyle(1, 0x1f1b17, 0.5);
+    gfx.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 0; x < width; x += 80) gfx.lineBetween(x, 0, x, height);
     for (let y = 0; y < height; y += 60) gfx.lineBetween(0, y, width, y);
 
     // Divider between enemy zone and party zone
-    gfx.lineStyle(1, 0x3a3328, 0.5);
     const divY = Math.round((ROW_ENEMY_Y + SLOT_HEIGHT / 2 + ROW_PARTY_Y - PARTY_SLOT_HEIGHT / 2) / 2);
-    gfx.lineBetween(48, divY, width - 48, divY);
+    drawSeparator(this, 0, divY, width, THEME.accentDim, 0.25);
     // Divider above action bar
-    gfx.lineBetween(20, ROW_ACTIONS_Y - 32, width - 20, ROW_ACTIONS_Y - 32);
+    drawSeparator(this, 0, ROW_ACTIONS_Y - 32, width, THEME.accent, 0.3);
   }
 
   private buildDefaultParty(): CharacterInstance[] {
@@ -266,35 +269,32 @@ export class BattleScene extends Phaser.Scene {
 
     // Round counter
     this.roundText = this.add
-      .text(width / 2, 20, `Round ${this.state.currentRound}`, {
-        fontSize: '18px',
-        color: '#7a7060',
-        fontFamily: 'Georgia, serif',
+      .text(width / 2, 20, `ROUND ${this.state.currentRound}`, {
+        ...THEME.fonts.label,
+        fontSize: '14px',
       })
       .setOrigin(0.5, 0);
 
     // Status text (turns, actions)
     this.statusText = this.add
-      .text(width / 2, 48, '', {
-        fontSize: '20px',
-        color: '#f0e4c8',
-        fontFamily: 'Georgia, serif',
+      .text(width / 2, 44, '', {
+        ...THEME.fonts.hud,
+        color: THEME.textPrimary,
       })
       .setOrigin(0.5, 0);
 
     // Gold display
-    this.add.text(width - 16, 16, `Oro: ${gameState.runMeta.gold}`, {
-      fontSize: '15px',
-      color: '#f4d57a',
-      fontFamily: 'Georgia, serif',
+    this.add.text(width - 16, 16, `ORO: ${gameState.runMeta.gold}`, {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
+      letterSpacing: 2,
     }).setOrigin(1, 0).setName('goldText');
 
     // Speed selector (top-left)
     this.speedBtn1 = this.add.text(12, 12, '▶', {
-      fontSize: '20px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      backgroundColor: '#2a2318',
+      ...THEME.fonts.hudSmall,
+      color: THEME.textPrimary,
+      backgroundColor: THEME.bgPanelHex,
       padding: { left: 6, right: 6, top: 3, bottom: 3 },
     })
       .setOrigin(0, 0)
@@ -302,10 +302,9 @@ export class BattleScene extends Phaser.Scene {
       .on('pointerdown', () => this.setBattleSpeed(1));
 
     this.speedBtn2 = this.add.text(48, 12, '⏩', {
-      fontSize: '20px',
-      color: '#7a7060',
-      fontFamily: 'Georgia, serif',
-      backgroundColor: '#2a2318',
+      ...THEME.fonts.hudSmall,
+      color: THEME.textDim,
+      backgroundColor: THEME.bgPanelHex,
       padding: { left: 6, right: 6, top: 3, bottom: 3 },
     })
       .setOrigin(0, 0)
@@ -321,10 +320,8 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private refreshSpeedButtons(): void {
-    const activeColor = '#f0e4c8';
-    const inactiveColor = '#4a4030';
-    if (this.speedBtn1) this.speedBtn1.setColor(this.battleSpeed === 1 ? activeColor : inactiveColor);
-    if (this.speedBtn2) this.speedBtn2.setColor(this.battleSpeed === 2 ? activeColor : inactiveColor);
+    if (this.speedBtn1) this.speedBtn1.setColor(this.battleSpeed === 1 ? THEME.textPrimary : THEME.accentDeepHex);
+    if (this.speedBtn2) this.speedBtn2.setColor(this.battleSpeed === 2 ? THEME.textPrimary : THEME.accentDeepHex);
   }
 
   private animDuration(base: number): number {
@@ -334,28 +331,26 @@ export class BattleScene extends Phaser.Scene {
 
   private renderCombatLog(): void {
     const { width } = this.scale;
-    // Log sits to the right, between enemy row and party row
     const logW = 230;
     const logH = LOG_LINES * 18 + 28;
     const logX = width - logW - 12;
     const logY = ROW_ENEMY_Y + SLOT_HEIGHT / 2 + 16;
 
-    this.add.rectangle(logX + logW / 2, logY + logH / 2, logW, logH, 0x0c0a08, 0.85)
-      .setStrokeStyle(1, 0x3a3020, 0.9)
-      .setDepth(10);
+    const logBg = this.add.graphics().setDepth(10);
+    logBg.fillStyle(THEME.bgPanel, 0.88);
+    logBg.fillRect(logX, logY, logW, logH);
+    drawCornerBox(logBg, logX, logY, logW, logH, 8, THEME.accentDim, 0.5);
 
-    this.add.text(logX + 8, logY + 6, 'Combate', {
-      fontSize: '11px',
-      color: '#6a5a40',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.add.text(logX + 8, logY + 6, 'COMBATE', {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentDimHex,
+      letterSpacing: 3,
     }).setDepth(11);
 
     for (let i = 0; i < LOG_LINES; i++) {
       const txt = this.add.text(logX + 8, logY + 20 + i * 18, '', {
-        fontSize: '11px',
-        color: '#9a8e78',
-        fontFamily: 'Georgia, serif',
+        ...THEME.fonts.hudSmall,
+        color: THEME.textPrimary,
         wordWrap: { width: logW - 16 },
       }).setDepth(11);
       this.logTexts.push(txt);
@@ -401,10 +396,8 @@ export class BattleScene extends Phaser.Scene {
         : (unit as EnemyInstance).data.name.charAt(0).toUpperCase();
 
       const txt = this.add.text(x, 0, label, {
-        fontSize: '12px',
-        color: unit.isDown ? '#444444' : '#dddddd',
-        fontFamily: 'sans-serif',
-        fontStyle: 'bold',
+        ...THEME.fonts.hudSmall,
+        color: unit.isDown ? '#444444' : THEME.textPrimary,
       }).setOrigin(0.5).setAlpha(alpha);
 
       this.turnQueueContainer!.add([dot, txt]);
@@ -444,8 +437,8 @@ export class BattleScene extends Phaser.Scene {
     const barW = slotW - 12;
 
     const rect = this.add
-      .rectangle(x, y, slotW, slotH, isParty ? 0x1a1a2a : color, isParty ? 0.7 : 1)
-      .setStrokeStyle(2, DEFAULT_STROKE_COLOR, 0.3)
+      .rectangle(x, y, slotW, slotH, isParty ? THEME.bgPanel : color, isParty ? 0.8 : 1)
+      .setStrokeStyle(2, DEFAULT_STROKE_COLOR, 0.2)
       .setInteractive({ useHandCursor: true });
 
     rect.on('pointerdown', () => this.handleSlotClick(combatant));
@@ -468,11 +461,11 @@ export class BattleScene extends Phaser.Scene {
     const infoTop = isParty ? y + slotH / 2 - 76 : y - slotH / 2 + 12;
 
     const nameText = this.add
-      .text(x, infoTop, name, {
-        fontSize: isParty ? '13px' : '15px',
-        color: '#e8dcc8',
-        fontFamily: 'Georgia, serif',
-        fontStyle: 'bold',
+      .text(x, infoTop, name.toUpperCase(), {
+        ...THEME.fonts.hudSmall,
+        fontSize: isParty ? '12px' : '13px',
+        color: THEME.textPrimary,
+        letterSpacing: 2,
       })
       .setOrigin(0.5);
 
@@ -488,9 +481,8 @@ export class BattleScene extends Phaser.Scene {
 
     const hpText = this.add
       .text(x, hpBarY + (isParty ? 10 : -11), this.formatHp(combatant), {
-        fontSize: '11px',
-        color: '#cccccc',
-        fontFamily: 'sans-serif',
+        ...THEME.fonts.hudSmall,
+        color: THEME.textPrimary,
       })
       .setOrigin(0.5);
 
@@ -523,9 +515,8 @@ export class BattleScene extends Phaser.Scene {
       const resTextY = (manaBarFg ? hpBarY + 41 : hpBarY + 33);
       resourceText = this.add
         .text(x, resTextY, this.formatResources(combatant), {
-          fontSize: '11px',
-          color: '#b8d4ff',
-          fontFamily: 'sans-serif',
+          ...THEME.fonts.hudSmall,
+          color: THEME.vigorHex,
         })
         .setOrigin(0.5);
     } else {
@@ -535,9 +526,8 @@ export class BattleScene extends Phaser.Scene {
     const battleTextY = isParty ? y + slotH / 2 - 10 : y + 48;
     const battleText = this.add
       .text(x, battleTextY, this.formatBattleRuntime(combatant), {
-        fontSize: '11px',
-        color: '#ffd166',
-        fontFamily: 'sans-serif',
+        ...THEME.fonts.hudSmall,
+        color: THEME.accentHex,
       })
       .setOrigin(0.5);
 
@@ -584,10 +574,10 @@ export class BattleScene extends Phaser.Scene {
     const { width } = this.scale;
 
     // ── Action bar background strip ──────────────────────────────────────────
-    // Replace this rectangle later with a proper sprite/9-slice panel
-    this.add
-      .rectangle(width / 2, ROW_ACTIONS_Y, width - 40, 52, 0x0f0e0c, 0.9)
-      .setStrokeStyle(1, 0x3a3020, 0.8);
+    const abBg = this.add.graphics();
+    abBg.fillStyle(THEME.bgPanel, 0.92);
+    abBg.fillRect(20, ROW_ACTIONS_Y - 26, width - 40, 52);
+    drawCornerBox(abBg, 20, ROW_ACTIONS_Y - 26, width - 40, 52, 10, THEME.accent, 0.5);
 
     // ── Action buttons ───────────────────────────────────────────────────────
     // Each entry: { label, key, onClick }
@@ -638,39 +628,42 @@ export class BattleScene extends Phaser.Scene {
     const panelX = width / 2 - panelW / 2;
     const panelY = ROW_ACTIONS_Y - 32 - panelH - 8;
 
-    const bg = this.add.rectangle(
-      panelX + panelW / 2,
-      panelY + panelH / 2,
-      panelW,
-      panelH,
-      0x111122,
-      0.95,
-    ).setStrokeStyle(1, 0x445588).setDepth(50);
-    this.skillMenuObjects.push(bg);
+    const bgGfx = this.add.graphics().setDepth(50);
+    bgGfx.fillStyle(THEME.bgPanel, 0.97);
+    bgGfx.fillRect(panelX, panelY, panelW, panelH);
+    drawCornerBox(bgGfx, panelX, panelY, panelW, panelH, 12, THEME.accent, 0.8);
+    this.skillMenuObjects.push(bgGfx);
 
-    const title = this.add.text(panelX + panelW / 2, panelY + 14, 'Habilidades', {
-      fontSize: '16px', color: '#aaaacc', fontFamily: 'sans-serif',
+    const title = this.add.text(panelX + panelW / 2, panelY + 14, 'HABILIDADES', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }).setOrigin(0.5, 0).setDepth(51);
     this.skillMenuObjects.push(title);
 
     skills.forEach((skill, i) => {
       const rowY = panelY + 42 + i * 70;
       const canUse = this.manager.skillExecutor.canUseSkill(actor, skill);
-      const nameColor = canUse ? '#ffffff' : '#666666';
+      const nameColor = canUse ? THEME.accentHex : THEME.accentDeepHex;
       const costStr = this.formatSkillCost(skill);
 
-      const nameBtn = this.add.text(panelX + 12, rowY, skill.name, {
-        fontSize: '18px', color: nameColor, fontFamily: 'sans-serif',
+      const nameBtn = this.add.text(panelX + 12, rowY, skill.name.toUpperCase(), {
+        ...THEME.fonts.hud,
+        fontSize: '15px',
+        color: nameColor,
+        letterSpacing: 2,
       }).setOrigin(0, 0).setDepth(51);
       this.skillMenuObjects.push(nameBtn);
 
       const costTxt = this.add.text(panelX + panelW - 12, rowY, costStr, {
-        fontSize: '15px', color: canUse ? '#ffd166' : '#555555', fontFamily: 'sans-serif',
+        ...THEME.fonts.hudSmall,
+        color: canUse ? THEME.accentHex : THEME.accentDeepHex,
       }).setOrigin(1, 0).setDepth(51);
       this.skillMenuObjects.push(costTxt);
 
       const descTxt = this.add.text(panelX + 12, rowY + 22, skill.description, {
-        fontSize: '12px', color: canUse ? '#999999' : '#444444', fontFamily: 'sans-serif',
+        ...THEME.fonts.body,
+        fontSize: '11px',
+        color: canUse ? THEME.textPrimary : THEME.textDim,
         wordWrap: { width: panelW - 24 },
       }).setOrigin(0, 0).setDepth(51);
       this.skillMenuObjects.push(descTxt);
@@ -773,26 +766,23 @@ export class BattleScene extends Phaser.Scene {
     const panelX = width / 2 - panelW / 2;
     const panelY = ROW_ACTIONS_Y - 32 - panelH - 8;
 
-    const bg = this.add.rectangle(
-      panelX + panelW / 2,
-      panelY + panelH / 2,
-      panelW,
-      panelH,
-      0x151814,
-      0.96,
-    ).setStrokeStyle(1, 0x7a6a42).setDepth(50);
-    this.itemMenuObjects.push(bg);
+    const itemBgGfx = this.add.graphics().setDepth(50);
+    itemBgGfx.fillStyle(THEME.bgPanel, 0.97);
+    itemBgGfx.fillRect(panelX, panelY, panelW, panelH);
+    drawCornerBox(itemBgGfx, panelX, panelY, panelW, panelH, 12, THEME.accent, 0.8);
+    this.itemMenuObjects.push(itemBgGfx);
 
-    const title = this.add.text(panelX + panelW / 2, panelY + 14, 'Consumibles', {
-      fontSize: '16px', color: '#d9c179', fontFamily: 'sans-serif',
+    const title = this.add.text(panelX + panelW / 2, panelY + 14, 'CONSUMIBLES', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }).setOrigin(0.5, 0).setDepth(51);
     this.itemMenuObjects.push(title);
 
     if (entries.length === 0) {
       const empty = this.add.text(panelX + 18, panelY + 52, 'No hay consumibles en la mochila.', {
-        fontSize: '14px',
-        color: '#888888',
-        fontFamily: 'sans-serif',
+        ...THEME.fonts.body,
+        fontSize: '13px',
+        color: THEME.textDim,
       }).setDepth(51);
       this.itemMenuObjects.push(empty);
       this.statusText.setText('No hay consumibles disponibles');
@@ -801,13 +791,15 @@ export class BattleScene extends Phaser.Scene {
 
     entries.forEach((entry, index) => {
       const rowY = panelY + 44 + index * 58;
-      const name = this.add.text(panelX + 12, rowY, `${entry.item.name}${entry.count > 1 ? ` x${entry.count}` : ''}`, {
-        fontSize: '17px', color: '#ffffff', fontFamily: 'sans-serif',
+      const name = this.add.text(panelX + 12, rowY, `${entry.item.name.toUpperCase()}${entry.count > 1 ? ` ×${entry.count}` : ''}`, {
+        ...THEME.fonts.hud,
+        fontSize: '14px',
+        letterSpacing: 2,
       }).setOrigin(0, 0).setDepth(51);
       const desc = this.add.text(panelX + 12, rowY + 22, entry.item.description, {
-        fontSize: '12px',
-        color: '#aaaaaa',
-        fontFamily: 'sans-serif',
+        ...THEME.fonts.body,
+        fontSize: '11px',
+        color: THEME.textPrimary,
         wordWrap: { width: panelW - 24 },
       }).setOrigin(0, 0).setDepth(51);
       const hitArea = this.add.rectangle(

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
 import { registry } from '@/data/Registry';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import { gameState } from '@/systems/GameState';
 import { saveManager } from '@/systems/SaveManager';
 import {
@@ -105,41 +107,36 @@ export class RewardScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x14110f, 1);
+    this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1);
+    addVignette(this, width, height);
 
     const graphics = this.add.graphics();
-    graphics.fillStyle(0x241d17, 0.9);
-    graphics.fillRect(0, 0, width, 112);
-    graphics.lineStyle(1, 0x625136, 0.55);
-    graphics.lineBetween(42, 112, width - 42, 112);
-
-    graphics.lineStyle(1, 0x2c261f, 0.35);
+    graphics.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 62; x < width; x += 80) {
       graphics.lineBetween(x, 136, x, height - 58);
     }
     for (let y = 140; y < height - 48; y += 58) {
       graphics.lineBetween(48, y, width - 48, y);
     }
+    drawSeparator(this, 42, 112, width - 84, THEME.accent, 0.4);
   }
 
   private renderHeader(): void {
     const { width } = this.scale;
     const encounterLabel = this.encounterLabel(this.summary.encounterType);
 
-    this.add.text(42, 28, 'Botin de victoria', {
-      fontSize: '36px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-    }).setOrigin(0, 0);
+    this.add.text(width / 2, 28, 'RECOMPENSA', {
+      ...THEME.fonts.heading,
+      fontSize: '32px',
+    }).setOrigin(0.5, 0);
 
-    this.add.text(44, 70, encounterLabel, {
-      fontSize: '15px',
-      color: '#9f9582',
-      fontFamily: 'Georgia, serif',
-    }).setOrigin(0, 0);
+    this.add.text(width / 2, 66, encounterLabel.toUpperCase(), {
+      ...THEME.fonts.label,
+      fontSize: '12px',
+    }).setOrigin(0.5, 0);
 
-    this.renderPill(width - 262, 38, `XP +${this.summary.xpGained}`, 0x283424, '#d7f0b2');
-    this.renderPill(width - 124, 38, `Oro +${this.summary.goldGained}`, 0x3a2d18, '#f4d57a');
+    this.renderPill(width - 262, 38, `XP +${this.summary.xpGained}`, THEME.bgPanel, THEME.textPrimary);
+    this.renderPill(width - 124, 38, `ORO +${this.summary.goldGained}`, THEME.bgPanel, THEME.accentHex);
   }
 
   private renderFixedRewardOutcome(): void {
@@ -160,45 +157,46 @@ export class RewardScene extends Phaser.Scene {
       ...(healLine ? [healLine] : []),
     ].join('\n');
 
-    this.add.text(width / 2, 120, title, {
-      fontSize: '46px',
-      color: '#f0d37a',
-      fontFamily: 'Georgia, serif',
+    this.add.text(width / 2, 120, title.toUpperCase(), {
+      ...THEME.fonts.heading,
+      fontSize: '42px',
     }).setOrigin(0.5);
 
     this.add.text(width / 2, 176, subtitle, {
+      ...THEME.fonts.dialogue,
       fontSize: '18px',
-      color: '#bfb49c',
-      fontFamily: 'Georgia, serif',
+      color: THEME.textPrimary,
       align: 'center',
       wordWrap: { width: 760, useAdvancedWrap: true },
     }).setOrigin(0.5);
 
-    this.add.rectangle(width / 2, height / 2 + 15, 620, 220, 0x211c17, 0.98)
-      .setStrokeStyle(2, 0xd1ad63, 0.82);
-    this.add.text(width / 2, height / 2 - 72, 'Recompensas', {
-      fontSize: '24px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const pw = 620, ph = 220;
+    const px = width / 2 - pw / 2;
+    const py = height / 2 - 94;
+    const panelGfx = this.add.graphics();
+    panelGfx.fillStyle(THEME.bgPanel, 0.98);
+    panelGfx.fillRect(px, py, pw, ph);
+    drawCornerBox(panelGfx, px, py, pw, ph, 14, THEME.accent, 0.8);
+
+    this.add.text(width / 2, height / 2 - 78, 'RECOMPENSAS', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }).setOrigin(0.5);
-    this.add.text(width / 2, height / 2 - 22, rewards, {
-      fontSize: '19px',
-      color: '#d8c8a8',
-      fontFamily: 'Georgia, serif',
+    this.add.text(width / 2, height / 2 - 44, rewards, {
+      ...THEME.fonts.body,
+      fontSize: '17px',
+      color: THEME.textPrimary,
       align: 'center',
       lineSpacing: 8,
     }).setOrigin(0.5, 0);
 
-    const button = this.add.text(width / 2, height - 92, 'Continuar', {
-      fontSize: '26px',
-      color: '#e8ca79',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const button = this.add.text(width / 2, height - 92, 'CONTINUAR', {
+      ...THEME.fonts.button,
+      fontSize: '20px',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-    button.on('pointerover', () => button.setColor('#fff0ad'));
-    button.on('pointerout', () => button.setColor('#e8ca79'));
+    button.on('pointerover', () => button.setColor('#ffffff'));
+    button.on('pointerout', () => button.setColor(THEME.accentHex));
     button.on('pointerdown', () => this.finishFixedRewardFlow());
   }
 
@@ -228,13 +226,14 @@ export class RewardScene extends Phaser.Scene {
     fill: number,
     color: string,
   ): void {
-    this.add.rectangle(x, y, 112, 34, fill, 0.96)
-      .setStrokeStyle(1, 0x766443, 0.72);
+    const pillGfx = this.add.graphics();
+    pillGfx.fillStyle(fill, 0.96);
+    pillGfx.fillRect(x - 56, y - 17, 112, 34);
+    drawCornerBox(pillGfx, x - 56, y - 17, 112, 34, 6, THEME.accentDim, 0.6);
     this.add.text(x, y, label, {
-      fontSize: '16px',
+      ...THEME.fonts.hudSmall,
+      fontSize: '13px',
       color,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5);
   }
 
@@ -245,15 +244,14 @@ export class RewardScene extends Phaser.Scene {
     const panelW = width - 84;
     const panelH = 84;
 
-    this.add.rectangle(panelX, panelY, panelW, panelH, 0x1d1915, 0.95)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x554a39, 0.82);
+    const levelGfx = this.add.graphics();
+    levelGfx.fillStyle(THEME.bgPanel, 0.95);
+    levelGfx.fillRect(panelX, panelY, panelW, panelH);
+    drawCornerBox(levelGfx, panelX, panelY, panelW, panelH, 10, THEME.accentDim, 0.5);
 
-    this.add.text(panelX + 18, panelY + 15, 'Progreso', {
-      fontSize: '18px',
-      color: '#e4d1a2',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.add.text(panelX + 18, panelY + 15, 'PROGRESO', {
+      ...THEME.fonts.label,
+      fontSize: '12px',
     });
 
     const text = this.summary.levelUps.length > 0
@@ -261,9 +259,9 @@ export class RewardScene extends Phaser.Scene {
       : 'Sin subidas de nivel. La experiencia queda guardada para la siguiente batalla.';
 
     this.add.text(panelX + 140, panelY + 15, text, {
-      fontSize: '14px',
-      color: '#bfb49c',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.body,
+      fontSize: '13px',
+      color: THEME.textPrimary,
       lineSpacing: 5,
       wordWrap: { width: panelW - 170, useAdvancedWrap: true },
     });
@@ -282,75 +280,72 @@ export class RewardScene extends Phaser.Scene {
   }
 
   private renderRewardCard(option: RewardOption, x: number, y: number): void {
-    const card = this.add.container(x, y);
-    card.setSize(CARD_WIDTH, CARD_HEIGHT);
+    const cardGfx = this.add.graphics();
+    cardGfx.fillStyle(THEME.bgPanel, 0.97);
+    cardGfx.fillRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+    drawCornerBox(cardGfx, x, y, CARD_WIDTH, CARD_HEIGHT, 12, option.accent, 0.7);
+    cardGfx.setInteractive(
+      new Phaser.Geom.Rectangle(x, y, CARD_WIDTH, CARD_HEIGHT),
+      Phaser.Geom.Rectangle.Contains,
+    );
 
-    const glow = this.add.rectangle(-5, -5, CARD_WIDTH + 10, CARD_HEIGHT + 10, option.accent, 0.08)
-      .setOrigin(0, 0)
-      .setVisible(false);
-    const background = this.add.rectangle(0, 0, CARD_WIDTH, CARD_HEIGHT, 0x211c17, 0.98)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x6a5a42, 0.88);
-    const strip = this.add.rectangle(0, 0, CARD_WIDTH, 7, option.accent, 0.86)
-      .setOrigin(0, 0);
+    const strip = this.add.rectangle(x, y, CARD_WIDTH, 5, option.accent, 0.85).setOrigin(0, 0);
 
-    const kicker = this.add.text(18, 24, option.kicker, {
-      fontSize: '12px',
-      color: '#a99f8a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const kicker = this.add.text(x + 18, y + 20, option.kicker.toUpperCase(), {
+      ...THEME.fonts.hudSmall,
+      fontSize: '11px',
+      color: THEME.textDim,
     });
 
-    const title = this.add.text(18, 48, option.title, {
-      fontSize: '24px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    const title = this.add.text(x + 18, y + 44, option.title.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
       wordWrap: { width: CARD_WIDTH - 36, useAdvancedWrap: true },
     });
 
-    const body = this.add.text(18, 104, option.body, {
-      fontSize: '15px',
-      color: '#beb49f',
-      fontFamily: 'Georgia, serif',
+    const body = this.add.text(x + 18, y + 96, option.body, {
+      ...THEME.fonts.body,
+      fontSize: '14px',
+      color: THEME.textPrimary,
       lineSpacing: 5,
       wordWrap: { width: CARD_WIDTH - 36, useAdvancedWrap: true },
     });
 
-    const footer = this.add.text(18, CARD_HEIGHT - 31, 'Elegir', {
-      fontSize: '15px',
-      color: '#e8ca79',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const footer = this.add.text(x + 18, y + CARD_HEIGHT - 30, 'ELEGIR', {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
     });
 
-    card.add([glow, background, strip, kicker, title, body, footer]);
+    cardGfx.on('pointerover', () => {
+      cardGfx.clear();
+      cardGfx.fillStyle(THEME.bgPanel, 0.97);
+      cardGfx.fillRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+      drawCornerBox(cardGfx, x, y, CARD_WIDTH, CARD_HEIGHT, 12, option.accent, 1);
+      footer.setColor('#ffffff');
+    });
+    cardGfx.on('pointerout', () => {
+      cardGfx.clear();
+      cardGfx.fillStyle(THEME.bgPanel, 0.97);
+      cardGfx.fillRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+      drawCornerBox(cardGfx, x, y, CARD_WIDTH, CARD_HEIGHT, 12, option.accent, 0.7);
+      footer.setColor(THEME.accentHex);
+    });
+    cardGfx.on('pointerdown', () => this.applyReward(option));
 
-    background.setInteractive({ useHandCursor: true });
-    background.on('pointerover', () => {
-      glow.setVisible(true);
-      background.setStrokeStyle(3, option.accent, 0.96);
-      footer.setColor('#fff0ad');
-    });
-    background.on('pointerout', () => {
-      glow.setVisible(false);
-      background.setStrokeStyle(1, 0x6a5a42, 0.88);
-      footer.setColor('#e8ca79');
-    });
-    background.on('pointerdown', () => this.applyReward(option));
+    [kicker, title, body, footer, strip].forEach(() => {});
   }
 
   private renderSkipButton(): void {
     const { width } = this.scale;
-    const button = this.add.text(width / 2, 642, 'Saltear recompensa', {
-      fontSize: '20px',
-      color: '#bfb29a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const button = this.add.text(width / 2, 642, 'SALTEAR RECOMPENSA', {
+      ...THEME.fonts.hudSmall,
+      fontSize: '13px',
+      color: THEME.textDim,
     }).setOrigin(0.5);
 
     button.setInteractive({ useHandCursor: true });
-    button.on('pointerover', () => button.setColor('#ffffff'));
-    button.on('pointerout', () => button.setColor('#bfb29a'));
+    button.on('pointerover', () => button.setColor(THEME.textPrimary));
+    button.on('pointerout', () => button.setColor(THEME.textDim));
     button.on('pointerdown', () => this.finishRewards('Solo XP y oro reclamados.'));
   }
 
@@ -454,12 +449,11 @@ export class RewardScene extends Phaser.Scene {
     this.feedbackObjects = [];
 
     const { width } = this.scale;
-    const bg = this.add.rectangle(width / 2, 585, 560, 44, 0x252018, 0.98)
-      .setStrokeStyle(1, 0xd1ad63, 0.8);
+    const bg = this.add.rectangle(width / 2, 585, 560, 44, THEME.bgPanel, 0.98)
+      .setStrokeStyle(1, THEME.accent, 0.7);
     const text = this.add.text(width / 2, 585, message, {
-      fontSize: '16px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hud,
+      fontSize: '14px',
     }).setOrigin(0.5);
 
     this.feedbackObjects.push(bg, text);
@@ -475,35 +469,36 @@ export class RewardScene extends Phaser.Scene {
     const shade = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.62)
       .setInteractive()
       .setDepth(700);
-    const panel = this.add.rectangle(width / 2, height / 2, 520, 230, 0x1c1714, 0.98)
-      .setStrokeStyle(2, 0xc55f65, 0.9)
-      .setDepth(701);
-    const title = this.add.text(width / 2, height / 2 - 78, 'Pacto del Hambre', {
-      fontSize: '28px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    const pw = 520, ph = 230;
+    const px = width / 2 - pw / 2;
+    const py = height / 2 - ph / 2;
+    const panelGfx = this.add.graphics().setDepth(701);
+    panelGfx.fillStyle(THEME.bgPanel, 0.98);
+    panelGfx.fillRect(px, py, pw, ph);
+    drawCornerBox(panelGfx, px, py, pw, ph, 14, 0xc55f65, 0.9);
+    const title = this.add.text(width / 2, height / 2 - 78, 'PACTO DEL HAMBRE', {
+      ...THEME.fonts.heading,
+      fontSize: '24px',
     }).setOrigin(0.5).setDepth(702);
     const body = this.add.text(width / 2, height / 2 - 42, 'Elegir portador: +1 accion por round, no puede curarse.', {
-      fontSize: '15px',
-      color: '#cbbda1',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.body,
+      fontSize: '14px',
+      color: THEME.textPrimary,
     }).setOrigin(0.5).setDepth(702);
 
-    this.pactObjects.push(shade, panel, title, body);
+    this.pactObjects.push(shade, panelGfx, title, body);
 
     const gap = 150;
     const startX = width / 2 - ((gameState.party.length - 1) * gap) / 2;
     gameState.party.forEach((character, index) => {
       const x = startX + index * gap;
-      const button = this.add.text(x, height / 2 + 36, this.shortName(character.data.name), {
-        fontSize: '20px',
-        color: '#f0d37a',
-        fontFamily: 'Georgia, serif',
-        fontStyle: 'bold',
+      const button = this.add.text(x, height / 2 + 36, this.shortName(character.data.name).toUpperCase(), {
+        ...THEME.fonts.hud,
+        fontSize: '16px',
       }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(702);
 
-      button.on('pointerover', () => button.setColor('#fff0ad'));
-      button.on('pointerout', () => button.setColor('#f0d37a'));
+      button.on('pointerover', () => button.setColor('#ffffff'));
+      button.on('pointerout', () => button.setColor(THEME.accentHex));
       button.on('pointerdown', () => {
         gameState.addItem(item.id, { relicTargetCharacterId: character.data.id });
         this.finishRewards(`${item.name} ligado a ${this.shortName(character.data.name)}.`);

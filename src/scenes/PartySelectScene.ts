@@ -10,6 +10,8 @@ import {
   type SkillData,
   type Stats,
 } from '@/types';
+import { THEME } from '@/ui/UITheme';
+import { drawSeparator, addVignette } from '@/ui/UIHelpers';
 
 const MAX_PARTY_SIZE = 4;
 const CARD_HEIGHT = 438;
@@ -31,6 +33,7 @@ const PORTRAIT_ASSETS: Record<string, { key: string; path: string }> = {
   lyra: { key: 'portrait_lyra', path: '/assets/characters/lyra_control.png' },
 };
 
+// Acentos por personaje — no cambian con el tema global
 const CHARACTER_ACCENTS: Record<string, number> = {
   bram: 0xd5b46a,
   vera: 0xc5695a,
@@ -86,10 +89,12 @@ export class PartySelectScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x14110f, 1);
+    this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1);
+
+    addVignette(this, width, height);
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x2a2722, 0.28);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 56; x < width; x += 74) {
       grid.lineBetween(x, 98, x, height - 72);
     }
@@ -97,41 +102,38 @@ export class PartySelectScene extends Phaser.Scene {
       grid.lineBetween(48, y, width - 48, y);
     }
 
+    // Banner de header — solo línea de separación
     const banner = this.add.graphics();
-    banner.fillStyle(0x221c17, 0.88);
+    banner.fillStyle(THEME.bgPanel, 0.85);
     banner.fillRect(0, 0, width, 92);
-    banner.fillStyle(0x3a261e, 0.72);
-    banner.fillTriangle(0, 92, 210, 92, 0, 152);
-    banner.fillStyle(0x17242d, 0.6);
-    banner.fillTriangle(width, 92, width - 240, 92, width, 160);
   }
 
   private renderHeader(): void {
     const { width } = this.scale;
 
     this.add
-      .text(42, 24, 'Seleccion de party', {
-        fontSize: '34px',
-        color: '#f0e4c8',
-        fontFamily: 'Georgia, serif',
+      .text(42, 22, 'SELECCIÓN DE PARTY', {
+        ...THEME.fonts.heading,
+        fontSize: '28px',
       })
       .setOrigin(0, 0);
 
     this.add
-      .text(44, 62, 'El estandarte solo avanza con quienes lo cargan.', {
-        fontSize: '15px',
-        color: '#9f9582',
-        fontFamily: 'Georgia, serif',
+      .text(44, 58, 'El estandarte solo avanza con quienes lo cargan.', {
+        ...THEME.fonts.dialogue,
+        fontSize: '14px',
+        color: THEME.textDim,
       })
       .setOrigin(0, 0);
 
     this.add
-      .text(width - 44, 34, `${this.availableCharacters.length} disponibles`, {
-        fontSize: '18px',
-        color: '#d1be8a',
-        fontFamily: 'Georgia, serif',
+      .text(width - 44, 34, `${this.availableCharacters.length} DISPONIBLES`, {
+        ...THEME.fonts.label,
+        fontSize: '14px',
       })
       .setOrigin(1, 0);
+
+    drawSeparator(this, 0, 92, width, THEME.accent, 0.35);
   }
 
   private renderCharacterCards(): void {
@@ -179,11 +181,11 @@ export class PartySelectScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setVisible(false);
     const background = this.add
-      .rectangle(0, 0, cardWidth, CARD_HEIGHT, 0x201c18, 0.98)
+      .rectangle(0, 0, cardWidth, CARD_HEIGHT, THEME.bgPanel, 0.97)
       .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x5d513f, 0.95);
+      .setStrokeStyle(1, THEME.accentDim, 0.4);
     const headerStrip = this.add
-      .rectangle(0, 0, cardWidth, 7, accent, 0.78)
+      .rectangle(0, 0, cardWidth, 5, accent, 0.85)
       .setOrigin(0, 0);
 
     container.add([hoverGlow, background, headerStrip]);
@@ -191,23 +193,19 @@ export class PartySelectScene extends Phaser.Scene {
     this.renderCardText(container, character, cardWidth);
 
     const selectionPlate = this.add
-      .rectangle(cardWidth - 72, 18, 58, 22, 0x11100e, 0.92)
+      .rectangle(cardWidth - 72, 18, 58, 22, THEME.bgDeep, 0.92)
       .setOrigin(0.5)
       .setStrokeStyle(1, accent, 0.68);
     const selectionText = this.add
       .text(cardWidth - 72, 18, '', {
-        fontSize: '11px',
-        color: '#f2df9a',
-        fontFamily: 'Georgia, serif',
-        fontStyle: 'bold',
+        ...THEME.fonts.hudSmall,
+        color: THEME.accentHex,
       })
       .setOrigin(0.5);
     const marker = this.add
       .text(18, 18, '', {
-        fontSize: '18px',
-        color: '#f2df9a',
-        fontFamily: 'Georgia, serif',
-        fontStyle: 'bold',
+        ...THEME.fonts.hud,
+        color: THEME.accentHex,
       })
       .setOrigin(0.5);
     container.add([selectionPlate, selectionText, marker, hitArea]);
@@ -228,7 +226,7 @@ export class PartySelectScene extends Phaser.Scene {
     accent: number,
   ): void {
     const frame = this.add
-      .rectangle(cardWidth / 2, 58, 88, 88, 0x151312, 0.95)
+      .rectangle(cardWidth / 2, 58, 88, 88, THEME.bgDeep, 0.95)
       .setStrokeStyle(1, accent, 0.7);
     container.add(frame);
 
@@ -241,12 +239,10 @@ export class PartySelectScene extends Phaser.Scene {
 
     const sigil = this.add
       .circle(cardWidth / 2, 58, 32, accent, 0.34)
-      .setStrokeStyle(1, 0xf0e4c8, 0.4);
+      .setStrokeStyle(1, THEME.textPrimaryNum, 0.4);
     const initials = this.add.text(cardWidth / 2, 58, this.getInitials(character.name), {
+      ...THEME.fonts.heading,
       fontSize: '22px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add([sigil, initials]);
   }
@@ -260,44 +256,41 @@ export class PartySelectScene extends Phaser.Scene {
     const skills = this.getCharacterSkills(character);
     const skillText = skills.map((skill) => this.formatSkillName(skill)).join('\n');
 
-    const name = this.add.text(cardWidth / 2, 109, character.name, {
-      fontSize: '16px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    const name = this.add.text(cardWidth / 2, 109, character.name.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
+      color: THEME.textPrimary,
       align: 'center',
       fixedWidth: contentWidth,
       wordWrap: { width: contentWidth, useAdvancedWrap: true },
     }).setOrigin(0.5, 0);
 
-    const classText = this.add.text(cardWidth / 2, 150, CLASS_LABELS[character.className], {
-      fontSize: '13px',
-      color: '#b8ad98',
-      fontFamily: 'Georgia, serif',
+    const classText = this.add.text(cardWidth / 2, 132, CLASS_LABELS[character.className].toUpperCase(), {
+      ...THEME.fonts.label,
+      fontSize: '11px',
       align: 'center',
       fixedWidth: contentWidth,
     }).setOrigin(0.5, 0);
 
-    const stats = this.renderStatsGrid(character.baseStats, cardWidth, 176);
+    const stats = this.renderStatsGrid(character.baseStats, cardWidth, 158);
 
-    const description = this.add.text(14, 246, this.shortDescription(character.description), {
-      fontSize: '12px',
-      color: '#bdb39f',
-      fontFamily: 'Georgia, serif',
+    const description = this.add.text(14, 228, this.shortDescription(character.description), {
+      ...THEME.fonts.body,
+      fontSize: '11px',
+      color: THEME.textPrimary,
       lineSpacing: 3,
       wordWrap: { width: contentWidth, useAdvancedWrap: true },
     });
 
-    const skillsTitle = this.add.text(14, 306, 'Habilidades', {
-      fontSize: '12px',
-      color: '#d7c48f',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const skillsTitle = this.add.text(14, 296, 'HABILIDADES', {
+      ...THEME.fonts.label,
+      fontSize: '10px',
     });
 
-    const skillsList = this.add.text(14, 326, skillText, {
-      fontSize: '11px',
-      color: '#a99f8b',
-      fontFamily: 'Georgia, serif',
+    const skillsList = this.add.text(14, 314, skillText, {
+      ...THEME.fonts.body,
+      fontSize: '10px',
+      color: THEME.textDim,
       lineSpacing: 2,
       wordWrap: { width: contentWidth, useAdvancedWrap: true },
     });
@@ -317,21 +310,20 @@ export class PartySelectScene extends Phaser.Scene {
     const objects: Phaser.GameObjects.GameObject[] = [];
     const boxGap = 6;
     const boxWidth = (cardWidth - 28 - boxGap * 2) / 3;
-    const boxHeight = 28;
+    const boxHeight = 26;
 
     rows.forEach(([label, value], index) => {
       const col = index % 3;
       const row = Math.floor(index / 3);
       const x = 14 + col * (boxWidth + boxGap);
-      const boxY = y + row * (boxHeight + 6);
+      const boxY = y + row * (boxHeight + 5);
       const box = this.add
-        .rectangle(x, boxY, boxWidth, boxHeight, 0x171512, 0.96)
+        .rectangle(x, boxY, boxWidth, boxHeight, THEME.bgDeep, 0.96)
         .setOrigin(0, 0)
-        .setStrokeStyle(1, 0x40382d, 0.8);
+        .setStrokeStyle(1, THEME.accentDeep, 0.6);
       const statText = this.add.text(x + boxWidth / 2, boxY + boxHeight / 2, `${label} ${value}`, {
-        fontSize: '11px',
-        color: '#ded1b1',
-        fontFamily: 'Georgia, serif',
+        ...THEME.fonts.hudSmall,
+        color: THEME.textPrimary,
       }).setOrigin(0.5);
       objects.push(box, statText);
     });
@@ -340,43 +332,43 @@ export class PartySelectScene extends Phaser.Scene {
   }
 
   private renderFooter(): void {
-    const { width } = this.scale;
+    const { width, height } = this.scale;
 
-    this.add
-      .rectangle(width / 2, 590, width - 86, 66, 0x1d1915, 0.95)
-      .setStrokeStyle(1, 0x5a4b36, 0.8);
+    drawSeparator(this, 0, height - 80, width, THEME.accent, 0.3);
 
-    this.partySummary = this.add.text(64, 571, '', {
-      fontSize: '18px',
-      color: '#efe1bc',
-      fontFamily: 'Georgia, serif',
+    const footerGfx = this.add.graphics();
+    footerGfx.fillStyle(THEME.bgPanel, 0.92);
+    footerGfx.fillRect(0, height - 80, width, 80);
+
+    this.partySummary = this.add.text(64, height - 62, '', {
+      ...THEME.fonts.hud,
+      color: THEME.textPrimary,
       fixedWidth: width - 360,
       wordWrap: { width: width - 360, useAdvancedWrap: true },
     });
 
-    this.limitNotice = this.add.text(64, 602, '', {
-      fontSize: '13px',
-      color: '#9c927e',
-      fontFamily: 'Georgia, serif',
+    this.limitNotice = this.add.text(64, height - 36, '', {
+      ...THEME.fonts.hudSmall,
+      color: THEME.textDim,
       fixedWidth: width - 360,
       wordWrap: { width: width - 360, useAdvancedWrap: true },
     });
 
-    this.startButton = this.createSceneButton(width - 205, 588, 'Comenzar run', () => {
+    this.startButton = this.createSceneButton(width - 205, height - 42, 'COMENZAR RUN', () => {
       this.startRun();
     }, {
-      baseColor: '#f0d37a',
-      hoverColor: '#fff0b0',
-      disabledColor: '#6b6255',
-      fontSize: '24px',
+      baseColor: THEME.accentHex,
+      hoverColor: '#ffffff',
+      disabledColor: THEME.accentDeepHex,
+      fontSize: '20px',
     });
 
-    this.createSceneButton(width - 82, 650, 'Volver', () => {
+    this.createSceneButton(width - 82, height - 20, 'VOLVER', () => {
       this.scene.start(SceneKeys.MAIN_MENU);
     }, {
-      baseColor: '#c8b99c',
-      hoverColor: '#ffffff',
-      fontSize: '20px',
+      baseColor: THEME.textDim,
+      hoverColor: THEME.accentHex,
+      fontSize: '14px',
     });
   }
 
@@ -393,10 +385,9 @@ export class PartySelectScene extends Phaser.Scene {
     },
   ): Phaser.GameObjects.Text {
     const button = this.add.text(x, y, label, {
+      ...THEME.fonts.button,
       fontSize: options.fontSize,
       color: options.baseColor,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5);
 
     button.setData('baseColor', options.baseColor);
@@ -428,7 +419,7 @@ export class PartySelectScene extends Phaser.Scene {
     }
 
     if (this.selectedIds.size >= MAX_PARTY_SIZE) {
-      this.limitNotice.setText(`Maximo ${MAX_PARTY_SIZE} personajes en la party.`);
+      this.limitNotice.setText(`Máximo ${MAX_PARTY_SIZE} personajes en la party.`);
       return;
     }
 
@@ -467,14 +458,14 @@ export class PartySelectScene extends Phaser.Scene {
     const isHovered = this.hoveredIds.has(characterId);
     const accent = CHARACTER_ACCENTS[characterId] ?? 0xd0b36f;
 
-    view.background.setFillStyle(isSelected ? 0x2a2118 : 0x201c18, 0.98);
-    view.background.setStrokeStyle(isSelected ? 3 : isHovered ? 2 : 1, accent, isSelected ? 1 : 0.8);
+    view.background.setFillStyle(isSelected ? 0x120f1e : THEME.bgPanel, 0.98);
+    view.background.setStrokeStyle(isSelected ? 2 : isHovered ? 1 : 1, isSelected ? THEME.accent : THEME.accentDim, isSelected ? 0.8 : 0.35);
     view.hoverGlow.setVisible(isSelected || isHovered);
-    view.hoverGlow.setAlpha(isSelected ? 0.16 : 0.08);
-    view.selectionPlate.setFillStyle(isSelected ? accent : 0x11100e, isSelected ? 0.9 : 0.7);
+    view.hoverGlow.setFillStyle(isSelected ? THEME.accent : accent, isSelected ? 0.1 : 0.06);
+    view.selectionPlate.setFillStyle(isSelected ? THEME.accent : THEME.bgDeep, isSelected ? 0.85 : 0.7);
     view.selectionText.setText(isSelected ? 'ELEGIDO' : '');
-    view.selectionText.setColor(isSelected ? '#1b1711' : '#f2df9a');
-    view.marker.setText(isSelected ? '+' : '');
+    view.selectionText.setColor(isSelected ? THEME.bgDeepHex : THEME.accentHex);
+    view.marker.setText(isSelected ? '◆' : '');
   }
 
   private updateStartButtonState(): void {
@@ -515,7 +506,7 @@ export class PartySelectScene extends Phaser.Scene {
       [SkillType.NATIVE]: 'Nat',
       [SkillType.ULTIMATE]: 'Ult',
     };
-    return `${badge[skill.type]} - ${skill.name}`;
+    return `${badge[skill.type]} — ${skill.name}`;
   }
 
   private shortDescription(description: string): string {

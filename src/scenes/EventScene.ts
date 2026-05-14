@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
 import { registry } from '@/data/Registry';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import { gameState } from '@/systems/GameState';
 import {
   addRolledItem,
@@ -70,42 +72,41 @@ export class EventScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, 0x111014, 1));
+    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1));
+    this.addViewObject(addVignette(this, width, height));
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x2c2933, 0.32);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 60; x < width; x += 88) {
       grid.lineBetween(x, 110, x, height - 56);
     }
     for (let y = 126; y < height - 52; y += 58) {
       grid.lineBetween(42, y, width - 42, y);
     }
-    grid.lineStyle(2, 0x625176, 0.42);
-    grid.lineBetween(42, 104, width - 42, 104);
     this.addViewObject(grid);
+    this.addViewObject(drawSeparator(this, 42, 104, width - 84, THEME.accent, 0.4));
   }
 
   private renderEventText(): void {
     const { width } = this.scale;
 
-    this.addViewObject(this.add.text(width / 2, 72, 'Evento', {
-      fontSize: '15px',
-      color: '#9d91ad',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(width / 2, 68, 'EVENTO', {
+      ...THEME.fonts.label,
+      fontSize: '13px',
     }).setOrigin(0.5));
 
-    this.addViewObject(this.add.text(width / 2, 132, this.eventData.title, {
-      fontSize: '42px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    this.addViewObject(this.add.text(width / 2, 128, this.eventData.title.toUpperCase(), {
+      ...THEME.fonts.heading,
+      fontSize: '38px',
       align: 'center',
     }).setOrigin(0.5));
 
-    this.addViewObject(this.add.text(width / 2, 214, this.eventData.description, {
-      fontSize: '19px',
-      color: '#c5b9a3',
-      fontFamily: 'Georgia, serif',
+    this.addViewObject(drawSeparator(this, width / 2 - 300, 168, 600, THEME.accentDim, 0.4));
+
+    this.addViewObject(this.add.text(width / 2, 196, this.eventData.description, {
+      ...THEME.fonts.dialogue,
+      fontSize: '18px',
+      color: THEME.textPrimary,
       align: 'center',
       lineSpacing: 7,
       wordWrap: { width: 760, useAdvancedWrap: true },
@@ -125,41 +126,43 @@ export class EventScene extends Phaser.Scene {
 
   private renderOption(option: EventOption, x: number, y: number): void {
     const met = this.requirementsMet(option.requirements ?? []);
-    const accent = met ? 0xd1ad63 : 0x5f5450;
-    const bg = this.add.rectangle(x, y, OPTION_WIDTH, OPTION_HEIGHT, met ? 0x201b20 : 0x181619, 0.98)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, accent, met ? 0.84 : 0.58);
-    const title = this.add.text(x + 16, y + 14, option.text, {
-      fontSize: '18px',
-      color: met ? '#f0e4c8' : '#78706a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const accentColor = met ? THEME.accent : THEME.accentDeep;
+    const accentAlpha = met ? 0.85 : 0.35;
+
+    const bgGfx = this.add.graphics();
+    bgGfx.fillStyle(THEME.bgPanel, met ? 0.97 : 0.85);
+    bgGfx.fillRect(x, y, OPTION_WIDTH, OPTION_HEIGHT);
+    drawCornerBox(bgGfx, x, y, OPTION_WIDTH, OPTION_HEIGHT, 12, accentColor, accentAlpha);
+
+    const title = this.add.text(x + 16, y + 14, option.text.toUpperCase(), {
+      ...THEME.fonts.button,
+      fontSize: '15px',
+      color: met ? THEME.accentHex : THEME.accentDeepHex,
       fixedWidth: OPTION_WIDTH - 32,
+      letterSpacing: 2,
     });
     const requirementText = this.requirementsLabel(option.requirements ?? []);
     const body = this.add.text(x + 16, y + 46, requirementText || 'Sin requisito', {
-      fontSize: '13px',
-      color: met ? '#b8ac98' : '#7b5d5d',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.body,
+      fontSize: '12px',
+      color: met ? THEME.textPrimary : THEME.textDim,
       wordWrap: { width: OPTION_WIDTH - 32, useAdvancedWrap: true },
     });
 
-    this.addViewObject(bg);
+    this.addViewObject(bgGfx);
     this.addViewObject(title);
     this.addViewObject(body);
 
     if (!met) return;
 
-    bg.setInteractive({ useHandCursor: true });
-    bg.on('pointerover', () => {
-      bg.setStrokeStyle(3, 0xd1ad63, 1);
-      title.setColor('#fff0ad');
+    bgGfx.setInteractive(new Phaser.Geom.Rectangle(x, y, OPTION_WIDTH, OPTION_HEIGHT), Phaser.Geom.Rectangle.Contains);
+    bgGfx.on('pointerover', () => {
+      title.setColor('#ffffff');
     });
-    bg.on('pointerout', () => {
-      bg.setStrokeStyle(1, accent, 0.84);
-      title.setColor('#f0e4c8');
+    bgGfx.on('pointerout', () => {
+      title.setColor(THEME.accentHex);
     });
-    bg.on('pointerdown', () => this.chooseOption(option));
+    bgGfx.on('pointerdown', () => this.chooseOption(option));
   }
 
   private chooseOption(option: EventOption): void {
@@ -388,19 +391,25 @@ export class EventScene extends Phaser.Scene {
 
   private showResult(message: string): void {
     const { width } = this.scale;
-    const panel = this.add.rectangle(width / 2, 360, 780, 138, 0x1b1720, 0.98)
-      .setStrokeStyle(2, 0xd1ad63, 0.9)
-      .setDepth(800);
+    const pw = 780, ph = 138;
+    const px = width / 2 - pw / 2;
+    const py = 291;
+
+    const panelGfx = this.add.graphics().setDepth(800);
+    panelGfx.fillStyle(THEME.bgPanel, 0.98);
+    panelGfx.fillRect(px, py, pw, ph);
+    drawCornerBox(panelGfx, px, py, pw, ph, 16, THEME.accent, 0.9);
+
     const text = this.add.text(width / 2, 360, message, {
+      ...THEME.fonts.dialogue,
       fontSize: '17px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      color: THEME.textPrimary,
       align: 'center',
       lineSpacing: 6,
       wordWrap: { width: 720, useAdvancedWrap: true },
     }).setOrigin(0.5).setDepth(801);
 
-    this.addViewObject(panel);
+    this.addViewObject(panelGfx);
     this.addViewObject(text);
   }
 

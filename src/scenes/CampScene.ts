@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
+import { THEME } from '@/ui/UITheme';
+import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import {
   completeCurrentMapNode,
   ensureRunParty,
@@ -54,13 +56,11 @@ export class CampScene extends Phaser.Scene {
 
   private renderBackground(): void {
     const { width, height } = this.scale;
-    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, 0x101515, 1));
-
-    const glow = this.add.circle(width / 2, height - 84, 230, 0xb66f32, 0.08);
-    this.addViewObject(glow);
+    this.addViewObject(this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1));
+    this.addViewObject(addVignette(this, width, height));
 
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x2f3c37, 0.28);
+    grid.lineStyle(1, THEME.accentDeep, 0.07);
     for (let x = 52; x < width; x += 84) {
       grid.lineBetween(x, 104, x, height - 54);
     }
@@ -68,6 +68,7 @@ export class CampScene extends Phaser.Scene {
       grid.lineBetween(42, y, width - 42, y);
     }
     this.addViewObject(grid);
+    this.addViewObject(drawSeparator(this, 42, 104, width - 84, THEME.accent, 0.4));
   }
 
   private renderHeader(): void {
@@ -77,23 +78,22 @@ export class CampScene extends Phaser.Scene {
         ? 'Elige una habilidad para reemplazarla por su version mejorada.'
         : 'Elige un personaje y una forja permanente.';
 
-    this.addViewObject(this.add.text(42, 25, 'Campamento', {
-      fontSize: '38px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-    }));
+    this.addViewObject(this.add.text(this.scale.width / 2, 30, 'CAMPAMENTO', {
+      ...THEME.fonts.heading,
+      fontSize: '32px',
+    }).setOrigin(0.5, 0));
 
-    this.addViewObject(this.add.text(44, 68, subtitle, {
+    this.addViewObject(this.add.text(this.scale.width / 2, 66, subtitle, {
+      ...THEME.fonts.dialogue,
       fontSize: '15px',
-      color: '#9fb0a7',
-      fontFamily: 'Georgia, serif',
-    }));
+      color: THEME.textDim,
+    }).setOrigin(0.5, 0));
 
     if (this.mode !== 'options') {
-      this.addViewObject(this.createActionText(this.scale.width - 94, 52, 'Volver', () => {
+      this.addViewObject(this.createActionText(this.scale.width - 94, 52, 'VOLVER', () => {
         this.mode = 'options';
         this.render();
-      }, 18, '#d5c7a7'));
+      }, 14, THEME.textPrimary));
     }
   }
 
@@ -149,48 +149,54 @@ export class CampScene extends Phaser.Scene {
     height: number,
     option: { title: string; kicker: string; body: string; action: () => void; accent: number },
   ): void {
-    const bg = this.add.rectangle(x, y, width, height, 0x18201d, 0.98)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x536b5e, 0.78)
-      .setInteractive({ useHandCursor: true });
-    const strip = this.add.rectangle(x, y, width, 8, option.accent, 0.92)
-      .setOrigin(0, 0);
-    const kicker = this.add.text(x + 18, y + 28, option.kicker, {
-      fontSize: '12px',
-      color: '#99aea4',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const cardGfx = this.add.graphics();
+    cardGfx.fillStyle(THEME.bgPanel, 0.97);
+    cardGfx.fillRect(x, y, width, height);
+    drawCornerBox(cardGfx, x, y, width, height, 12, THEME.accentDim, 0.7);
+    cardGfx.setInteractive(
+      new Phaser.Geom.Rectangle(x, y, width, height),
+      Phaser.Geom.Rectangle.Contains,
+    );
+
+    const strip = this.add.rectangle(x, y, width, 5, option.accent, 0.85).setOrigin(0, 0);
+    const kicker = this.add.text(x + 18, y + 22, option.kicker.toUpperCase(), {
+      ...THEME.fonts.hudSmall,
+      fontSize: '11px',
+      color: THEME.textDim,
     });
-    const title = this.add.text(x + 18, y + 58, option.title, {
-      fontSize: '28px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+    const title = this.add.text(x + 18, y + 52, option.title.toUpperCase(), {
+      ...THEME.fonts.heading,
+      fontSize: '24px',
     });
-    const body = this.add.text(x + 18, y + 112, option.body, {
-      fontSize: '15px',
-      color: '#c5bba6',
-      fontFamily: 'Georgia, serif',
+    const body = this.add.text(x + 18, y + 104, option.body, {
+      ...THEME.fonts.body,
+      fontSize: '14px',
+      color: THEME.textPrimary,
       lineSpacing: 5,
       wordWrap: { width: width - 36, useAdvancedWrap: true },
     });
-    const action = this.add.text(x + 18, y + height - 40, 'Elegir', {
-      fontSize: '16px',
-      color: '#f0d37a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const action = this.add.text(x + 18, y + height - 38, 'ELEGIR', {
+      ...THEME.fonts.hudSmall,
+      color: THEME.accentHex,
     });
 
-    bg.on('pointerover', () => {
-      bg.setStrokeStyle(3, option.accent, 1);
-      action.setColor('#fff0ad');
+    cardGfx.on('pointerover', () => {
+      cardGfx.clear();
+      cardGfx.fillStyle(THEME.bgPanel, 0.97);
+      cardGfx.fillRect(x, y, width, height);
+      drawCornerBox(cardGfx, x, y, width, height, 12, option.accent, 1);
+      action.setColor('#ffffff');
     });
-    bg.on('pointerout', () => {
-      bg.setStrokeStyle(1, 0x536b5e, 0.78);
-      action.setColor('#f0d37a');
+    cardGfx.on('pointerout', () => {
+      cardGfx.clear();
+      cardGfx.fillStyle(THEME.bgPanel, 0.97);
+      cardGfx.fillRect(x, y, width, height);
+      drawCornerBox(cardGfx, x, y, width, height, 12, THEME.accentDim, 0.7);
+      action.setColor(THEME.accentHex);
     });
-    bg.on('pointerdown', option.action);
+    cardGfx.on('pointerdown', option.action);
 
-    this.addViewObject(bg);
+    this.addViewObject(cardGfx);
     this.addViewObject(strip);
     this.addViewObject(kicker);
     this.addViewObject(title);
@@ -199,10 +205,11 @@ export class CampScene extends Phaser.Scene {
   }
 
   private renderSkillUpgrade(): void {
-    const panel = this.add.rectangle(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT, 0x17201d, 0.96)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x536b5e, 0.78);
-    this.addViewObject(panel);
+    const panelGfx = this.add.graphics();
+    panelGfx.fillStyle(THEME.bgPanel, 0.95);
+    panelGfx.fillRect(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT);
+    drawCornerBox(panelGfx, PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT, 12, THEME.accentDim, 0.6);
+    this.addViewObject(panelGfx);
 
     const cardWidth = 340;
     const gap = 22;
@@ -226,51 +233,48 @@ export class CampScene extends Phaser.Scene {
     width: number,
     height: number,
   ): void {
-    const bg = this.add.rectangle(x, y, width, height, 0x101817, 0.95)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, this.characterAccent(character.data.id), 0.82);
-    this.addViewObject(bg);
+    const colGfx = this.add.graphics();
+    colGfx.fillStyle(THEME.bgDeep, 0.9);
+    colGfx.fillRect(x, y, width, height);
+    drawCornerBox(colGfx, x, y, width, height, 8, this.characterAccent(character.data.id), 0.7);
+    this.addViewObject(colGfx);
 
-    this.addViewObject(this.add.text(x + 16, y + 16, getShortName(character.data.name), {
-      fontSize: '22px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(x + 16, y + 14, getShortName(character.data.name).toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '16px',
     }));
 
     const skills = getUpgradableSkills(character);
     if (skills.length === 0) {
-      this.addViewObject(this.add.text(x + 16, y + 58, 'Sin habilidades pendientes de mejora.', {
-        fontSize: '14px',
-        color: '#7d8b86',
-        fontFamily: 'Georgia, serif',
+      this.addViewObject(this.add.text(x + 16, y + 52, 'Sin habilidades pendientes de mejora.', {
+        ...THEME.fonts.body,
+        fontSize: '13px',
+        color: THEME.textDim,
         wordWrap: { width: width - 32, useAdvancedWrap: true },
       }));
       return;
     }
 
     skills.forEach((skill, index) => {
-      const rowY = y + 58 + index * 88;
-      const row = this.add.rectangle(x + 14, rowY, width - 28, 72, 0x17211e, 0.96)
+      const rowY = y + 52 + index * 88;
+      const row = this.add.rectangle(x + 14, rowY, width - 28, 72, THEME.bgPanel, 0.96)
         .setOrigin(0, 0)
-        .setStrokeStyle(1, 0x3f5c4e, 0.78)
+        .setStrokeStyle(1, THEME.accentDeep, 0.78)
         .setInteractive({ useHandCursor: true });
-      const name = this.add.text(x + 28, rowY + 11, `${skill.skillName} -> ${skill.improvedSkillName}`, {
-        fontSize: '15px',
-        color: '#f0d37a',
-        fontFamily: 'Georgia, serif',
-        fontStyle: 'bold',
+      const name = this.add.text(x + 28, rowY + 11, `${skill.skillName} → ${skill.improvedSkillName}`, {
+        ...THEME.fonts.hud,
+        fontSize: '13px',
         fixedWidth: width - 56,
       });
       const description = this.add.text(x + 28, rowY + 34, skill.description, {
+        ...THEME.fonts.body,
         fontSize: '12px',
-        color: '#b9c5bd',
-        fontFamily: 'Georgia, serif',
+        color: THEME.textPrimary,
         wordWrap: { width: width - 56, useAdvancedWrap: true },
       });
 
-      row.on('pointerover', () => row.setStrokeStyle(3, 0xd1ad63, 1));
-      row.on('pointerout', () => row.setStrokeStyle(1, 0x3f5c4e, 0.78));
+      row.on('pointerover', () => row.setStrokeStyle(2, THEME.accent, 1));
+      row.on('pointerout', () => row.setStrokeStyle(1, THEME.accentDeep, 0.78));
       row.on('pointerdown', () => this.applySkillUpgrade(character, skill.skillId));
 
       this.addViewObject(row);
@@ -280,10 +284,11 @@ export class CampScene extends Phaser.Scene {
   }
 
   private renderForge(): void {
-    const panel = this.add.rectangle(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT, 0x151d21, 0.96)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x4f6870, 0.78);
-    this.addViewObject(panel);
+    const panelGfx = this.add.graphics();
+    panelGfx.fillStyle(THEME.bgPanel, 0.95);
+    panelGfx.fillRect(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT);
+    drawCornerBox(panelGfx, PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT, 12, THEME.accentDim, 0.6);
+    this.addViewObject(panelGfx);
 
     const cardWidth = 340;
     const gap = 22;
@@ -305,16 +310,15 @@ export class CampScene extends Phaser.Scene {
     y: number,
     width: number,
   ): void {
-    const bg = this.add.rectangle(x, y, width, 300, 0x101719, 0.95)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, this.characterAccent(character.data.id), 0.82);
-    this.addViewObject(bg);
+    const colGfx = this.add.graphics();
+    colGfx.fillStyle(THEME.bgDeep, 0.9);
+    colGfx.fillRect(x, y, width, 300);
+    drawCornerBox(colGfx, x, y, width, 300, 8, this.characterAccent(character.data.id), 0.7);
+    this.addViewObject(colGfx);
 
-    this.addViewObject(this.add.text(x + 18, y + 18, getShortName(character.data.name), {
-      fontSize: '24px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    this.addViewObject(this.add.text(x + 18, y + 16, getShortName(character.data.name).toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '16px',
     }));
 
     const stats = [
@@ -322,10 +326,9 @@ export class CampScene extends Phaser.Scene {
       `POD ${this.formatNumber(character.currentStats.power)}`,
       `DEF ${this.formatNumber(character.currentStats.defense)}`,
     ].join('  ');
-    this.addViewObject(this.add.text(x + 18, y + 56, stats, {
-      fontSize: '14px',
-      color: '#aebebf',
-      fontFamily: 'Georgia, serif',
+    this.addViewObject(this.add.text(x + 18, y + 48, stats, {
+      ...THEME.fonts.hudSmall,
+      color: THEME.textPrimary,
     }));
 
     (['attack', 'power', 'defense'] as StatKey[]).forEach((stat, index) => {
@@ -366,13 +369,12 @@ export class CampScene extends Phaser.Scene {
   }
 
   private showResult(message: string): void {
-    const bg = this.add.rectangle(this.scale.width / 2, 640, 640, 44, 0x111817, 0.98)
-      .setStrokeStyle(1, 0xd1ad63, 0.86)
+    const bg = this.add.rectangle(this.scale.width / 2, 640, 640, 44, THEME.bgPanel, 0.98)
+      .setStrokeStyle(1, THEME.accent, 0.7)
       .setDepth(900);
     const text = this.add.text(this.scale.width / 2, 640, message, {
-      fontSize: '16px',
-      color: '#f0e4c8',
-      fontFamily: 'Georgia, serif',
+      ...THEME.fonts.hud,
+      fontSize: '14px',
     }).setOrigin(0.5).setDepth(901);
 
     this.addViewObject(bg);
@@ -386,24 +388,22 @@ export class CampScene extends Phaser.Scene {
     label: string,
     onClick: () => void,
   ): { bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text } {
-    const bg = this.add.rectangle(x, y, width, 42, 0x1d2b2d, 0.96)
+    const bg = this.add.rectangle(x, y, width, 42, THEME.bgPanel, 0.96)
       .setOrigin(0, 0)
-      .setStrokeStyle(1, 0x5e7c80, 0.82)
+      .setStrokeStyle(1, THEME.accentDim, 0.7)
       .setInteractive({ useHandCursor: true });
-    const text = this.add.text(x + width / 2, y + 21, label, {
-      fontSize: '17px',
-      color: '#f0d37a',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
+    const text = this.add.text(x + width / 2, y + 21, label.toUpperCase(), {
+      ...THEME.fonts.hud,
+      fontSize: '14px',
     }).setOrigin(0.5);
 
     bg.on('pointerover', () => {
-      bg.setStrokeStyle(3, 0x74a8d8, 1);
-      text.setColor('#fff0ad');
+      bg.setStrokeStyle(2, THEME.accent, 1);
+      text.setColor('#ffffff');
     });
     bg.on('pointerout', () => {
-      bg.setStrokeStyle(1, 0x5e7c80, 0.82);
-      text.setColor('#f0d37a');
+      bg.setStrokeStyle(1, THEME.accentDim, 0.7);
+      text.setColor(THEME.textPrimary);
     });
     bg.on('pointerdown', onClick);
 
@@ -419,14 +419,13 @@ export class CampScene extends Phaser.Scene {
     color: string,
   ): Phaser.GameObjects.Text {
     const text = this.add.text(x, y, label, {
+      ...THEME.fonts.hudSmall,
       fontSize: `${fontSize}px`,
       color,
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'bold',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     text.setData('baseColor', color);
-    text.on('pointerover', () => text.setColor('#fff0ad'));
+    text.on('pointerover', () => text.setColor('#ffffff'));
     text.on('pointerout', () => text.setColor(text.getData('baseColor') as string));
     text.on('pointerdown', onClick);
     return text;
