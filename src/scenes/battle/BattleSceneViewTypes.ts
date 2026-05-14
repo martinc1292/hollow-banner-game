@@ -5,6 +5,9 @@ export interface SlotView {
   combatant: Combatant;
   rect: Phaser.GameObjects.Rectangle;
   portrait: Phaser.GameObjects.Image | null;
+  shadow: Phaser.GameObjects.Ellipse;
+  glow: Phaser.GameObjects.Graphics;
+  frame: Phaser.GameObjects.Graphics;
   nameText: Phaser.GameObjects.Text;
   hpText: Phaser.GameObjects.Text;
   hpBarBg: Phaser.GameObjects.Rectangle;

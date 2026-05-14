@@ -8,9 +8,9 @@ import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
 import {
   ACTIVE_TURN_STROKE,
   DEFAULT_ENCOUNTER_ID,
-  DEFAULT_STROKE_COLOR,
   DOWN_COLOR,
   ENEMY_COLOR,
+  ENEMY_PORTRAIT_ASSETS,
   ENEMY_SLOT_COUNT,
   HP_BAR_BG,
   HP_BAR_FG,
@@ -127,7 +127,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   preload(): void {
-    const paths: Record<string, string> = {
+    const partyPaths: Record<string, string> = {
       bram: '/assets/characters/bram_tank.png',
       vera: '/assets/characters/vera_dps.png',
       mira: '/assets/characters/mira_mage.png',
@@ -136,7 +136,23 @@ export class BattleScene extends Phaser.Scene {
     };
     for (const [id, key] of Object.entries(PORTRAIT_ASSETS)) {
       if (!this.textures.exists(key)) {
-        this.load.image(key, paths[id]);
+        this.load.image(key, partyPaths[id]);
+      }
+    }
+
+    const enemyPaths: Record<string, string> = {
+      peregrino_vacio:    '/assets/enemies/peregrino_vacio.png',
+      lobo_corrupto:      '/assets/enemies/lobo_corrupto.png',
+      cuervo_carronero:   '/assets/enemies/cuervo_carronero.png',
+      guardian_oxidado:   '/assets/enemies/guardian_oxidado.png',
+      acolito_susurrante: '/assets/enemies/acolito_susurrante.png',
+      bandido_hueco:      '/assets/enemies/bandido_hueco.png',
+      el_pregonero:       '/assets/enemies/pregonero_miniboss.png',
+      padre_oxidado:      '/assets/enemies/bosses/padre_oxidado_boss.png',
+    };
+    for (const [id, key] of Object.entries(ENEMY_PORTRAIT_ASSETS)) {
+      if (!this.textures.exists(key)) {
+        this.load.image(key, enemyPaths[id]);
       }
     }
   }
@@ -395,29 +411,71 @@ export class BattleScene extends Phaser.Scene {
     const slotH = isParty ? PARTY_SLOT_HEIGHT : SLOT_HEIGHT;
     const barW = slotW - 12;
 
+    // [capa 0] Sombra elíptica bajo el sprite
+    const shadow = this.add
+      .ellipse(x, y + slotH / 2 - 6, slotW * 0.7, 14, 0x000000, 0.5)
+      .setOrigin(0.5);
+
+    // [capa 1] Halo radial de glow (alpha=0 inicialmente)
+    const glow = this.add.graphics();
+    glow.setPosition(x, y);
+    this.drawSlotGlow(glow, slotW, slotH, 0);
+
+    // [capa 2] Rect base — sin stroke visible (el frame lo reemplaza)
     const rect = this.add
       .rectangle(x, y, slotW, slotH, isParty ? THEME.bgPanel : color, isParty ? 0.8 : 1)
-      .setStrokeStyle(2, DEFAULT_STROKE_COLOR, 0.2)
       .setInteractive({ useHandCursor: true });
 
     rect.on('pointerdown', () => this.handleSlotClick(combatant));
     rect.on('pointerover', () => this.handleSlotHover(combatant, true));
     rect.on('pointerout', () => this.handleSlotHover(combatant, false));
 
-    // Portrait image (party members only)
+    // [capa 3] Sprite (player o enemy portrait)
     let portrait: Phaser.GameObjects.Image | null = null;
+    const spriteCenterY = isParty ? y - 38 : y - 30;
+    const spriteW = isParty ? slotW - 8 : slotW - 24;
+    const spriteH = isParty ? 146 : 112;
+
     if (isParty && isCharacterInstance(combatant)) {
       const portraitKey = PORTRAIT_ASSETS[combatant.data.id];
       if (portraitKey && this.textures.exists(portraitKey)) {
         portrait = this.add
-          .image(x, y - 30, portraitKey)
-          .setDisplaySize(slotW - 4, 120)
+          .image(x, spriteCenterY, portraitKey)
+          .setDisplaySize(spriteW, spriteH)
+          .setOrigin(0.5);
+      }
+    } else if (!isParty && !isCharacterInstance(combatant)) {
+      const enemyKey = ENEMY_PORTRAIT_ASSETS[combatant.data.id];
+      if (enemyKey && this.textures.exists(enemyKey)) {
+        portrait = this.add
+          .image(x, spriteCenterY, enemyKey)
+          .setDisplaySize(spriteW, spriteH)
           .setOrigin(0.5);
       }
     }
 
-    // Info area: for party slots, name goes below the portrait area
-    const infoTop = isParty ? y + slotH / 2 - 76 : y - slotH / 2 + 12;
+    // Idle breathing tween — sutil signo de vida
+    if (portrait) {
+      const baseScaleX = portrait.scaleX;
+      const baseScaleY = portrait.scaleY;
+      this.tweens.add({
+        targets: portrait,
+        scaleX: baseScaleX * 1.018,
+        scaleY: baseScaleY * 1.018,
+        duration: 2400,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
+    // [capa 4] Marco decorativo de esquinas
+    const frame = this.add.graphics();
+    frame.setPosition(x, y);
+    this.drawSlotFrame(frame, slotW, slotH, THEME.accent, 0.4, 1);
+
+    // Info area: name + bars debajo del sprite
+    const infoTop = y + slotH / 2 - (isParty ? 76 : 60);
 
     const nameText = this.add
       .text(x, infoTop, name.toUpperCase(), {
@@ -430,7 +488,7 @@ export class BattleScene extends Phaser.Scene {
 
     // HP bar
     const barH = isParty ? 7 : 8;
-    const hpBarY = isParty ? infoTop + 16 : y - 14;
+    const hpBarY = infoTop + 16;
     const hpBarBg = this.add.rectangle(x, hpBarY, barW, barH, HP_BAR_BG).setOrigin(0.5);
     const hpFrac = combatant.currentStats.hp / combatant.currentStats.hpMax;
     const hpColor = hpFrac > 0.4 ? HP_BAR_FG : HP_BAR_FG_LOW;
@@ -439,7 +497,7 @@ export class BattleScene extends Phaser.Scene {
       .setOrigin(0, 0.5);
 
     const hpText = this.add
-      .text(x, hpBarY + (isParty ? 10 : -11), this.formatHp(combatant), {
+      .text(x, hpBarY + 10, this.formatHp(combatant), {
         ...THEME.fonts.hudSmall,
         color: THEME.textPrimary,
       })
@@ -482,7 +540,7 @@ export class BattleScene extends Phaser.Scene {
       resourceText = this.add.text(x, y + 30, '', { fontSize: '11px' });
     }
 
-    const battleTextY = isParty ? y + slotH / 2 - 10 : y + 48;
+    const battleTextY = y + slotH / 2 - 10;
     const battleText = this.add
       .text(x, battleTextY, this.formatBattleRuntime(combatant), {
         ...THEME.fonts.hudSmall,
@@ -500,7 +558,7 @@ export class BattleScene extends Phaser.Scene {
           stroke: '#000000',
           strokeThickness: 3,
           align: 'center',
-          wordWrap: { width: SLOT_WIDTH + 36, useAdvancedWrap: true },
+          wordWrap: { width: slotW + 36, useAdvancedWrap: true },
         })
         .setOrigin(0.5, 1);
     }
@@ -509,6 +567,9 @@ export class BattleScene extends Phaser.Scene {
       combatant,
       rect,
       portrait,
+      shadow,
+      glow,
+      frame,
       nameText,
       hpText,
       hpBarBg,
@@ -527,6 +588,62 @@ export class BattleScene extends Phaser.Scene {
       isParty,
     });
     this.refreshStatusIcons(combatant);
+  }
+
+  // ── Helpers de presentación visual del slot ──────────────────────────────
+
+  /**
+   * Dibuja el marco decorativo de esquinas alrededor del slot.
+   * Coordenadas relativas (el Graphics está posicionado en el centro del slot).
+   */
+  private drawSlotFrame(
+    g: Phaser.GameObjects.Graphics,
+    w: number,
+    h: number,
+    color: number,
+    alpha: number,
+    lineWidth: number,
+  ): void {
+    g.clear();
+    g.lineStyle(lineWidth, color, alpha);
+    const left = -w / 2;
+    const top = -h / 2;
+    const right = w / 2;
+    const bottom = h / 2;
+    const size = 16;
+
+    g.beginPath();
+    g.moveTo(left, top + size); g.lineTo(left, top); g.lineTo(left + size, top);
+    g.strokePath();
+    g.beginPath();
+    g.moveTo(right - size, top); g.lineTo(right, top); g.lineTo(right, top + size);
+    g.strokePath();
+    g.beginPath();
+    g.moveTo(right, bottom - size); g.lineTo(right, bottom); g.lineTo(right - size, bottom);
+    g.strokePath();
+    g.beginPath();
+    g.moveTo(left + size, bottom); g.lineTo(left, bottom); g.lineTo(left, bottom - size);
+    g.strokePath();
+  }
+
+  /**
+   * Dibuja el halo radial de glow detrás del slot. alpha=0 lo oculta.
+   */
+  private drawSlotGlow(
+    g: Phaser.GameObjects.Graphics,
+    w: number,
+    h: number,
+    alpha: number,
+  ): void {
+    g.clear();
+    if (alpha <= 0) return;
+    const layers = 5;
+    for (let i = layers - 1; i >= 0; i--) {
+      const t = i / layers;
+      const a = alpha * (1 - t) * 0.45;
+      g.fillStyle(THEME.accent, a);
+      g.fillEllipse(0, 0, w * (1 + t * 0.4), h * (1 + t * 0.4));
+    }
   }
 
   private createActionButtons(): void {
@@ -929,11 +1046,10 @@ export class BattleScene extends Phaser.Scene {
     const view = this.slotViews.get(combatant);
     if (!view || !this.isTargetable(combatant)) return;
 
-    view.rect.setStrokeStyle(
-      isHovered ? 5 : 4,
-      TARGET_STROKE_COLOR,
-      isHovered ? 1 : 0.9,
-    );
+    const slotW = view.isParty ? PARTY_SLOT_WIDTH : SLOT_WIDTH;
+    const slotH = view.isParty ? PARTY_SLOT_HEIGHT : SLOT_HEIGHT;
+    this.drawSlotFrame(view.frame, slotW, slotH, TARGET_STROKE_COLOR, isHovered ? 1 : 0.9, isHovered ? 3 : 2);
+    this.drawSlotGlow(view.glow, slotW, slotH, isHovered ? 0.55 : 0.4);
   }
 
   private clearTargeting(): void {
@@ -944,14 +1060,24 @@ export class BattleScene extends Phaser.Scene {
 
   private updateTargetHighlights(): void {
     for (const [combatant, view] of this.slotViews) {
-      if (this.isTargetable(combatant)) {
-        view.rect.setStrokeStyle(4, TARGET_STROKE_COLOR, 0.9);
+      const slotW = view.isParty ? PARTY_SLOT_WIDTH : SLOT_WIDTH;
+      const slotH = view.isParty ? PARTY_SLOT_HEIGHT : SLOT_HEIGHT;
+
+      if (combatant.isDown) {
+        this.drawSlotFrame(view.frame, slotW, slotH, THEME.accent, 0.15, 1);
+        this.drawSlotGlow(view.glow, slotW, slotH, 0);
+        view.shadow.setAlpha(0.2);
+      } else if (this.isTargetable(combatant)) {
+        this.drawSlotFrame(view.frame, slotW, slotH, TARGET_STROKE_COLOR, 0.9, 2);
+        this.drawSlotGlow(view.glow, slotW, slotH, 0.4);
       } else {
         const isActive = this.state.turnQueue[this.state.currentActorIndex] === combatant;
-        if (isActive && !combatant.isDown) {
-          view.rect.setStrokeStyle(2, ACTIVE_TURN_STROKE, 0.7);
+        if (isActive) {
+          this.drawSlotFrame(view.frame, slotW, slotH, ACTIVE_TURN_STROKE, 1, 2);
+          this.drawSlotGlow(view.glow, slotW, slotH, 0.45);
         } else {
-          view.rect.setStrokeStyle(2, DEFAULT_STROKE_COLOR, 0.3);
+          this.drawSlotFrame(view.frame, slotW, slotH, THEME.accent, 0.4, 1);
+          this.drawSlotGlow(view.glow, slotW, slotH, 0);
         }
       }
     }
@@ -984,6 +1110,7 @@ export class BattleScene extends Phaser.Scene {
       actorView.rect, actorView.nameText, actorView.hpText,
       actorView.hpBarBg, actorView.hpBarFg,
       actorView.resourceText, actorView.battleText,
+      actorView.shadow, actorView.glow, actorView.frame,
       ...(actorView.portrait ? [actorView.portrait] : []),
       ...(actorView.vigorBarBg ? [actorView.vigorBarBg] : []),
       ...(actorView.vigorBarFg ? [actorView.vigorBarFg] : []),
@@ -1021,17 +1148,21 @@ export class BattleScene extends Phaser.Scene {
     const y = view.baseY;
     const slotH = view.isParty ? PARTY_SLOT_HEIGHT : SLOT_HEIGHT;
     const barW = (view.isParty ? PARTY_SLOT_WIDTH : SLOT_WIDTH) - 12;
-    const infoTop = view.isParty ? y + slotH / 2 - 76 : y - slotH / 2 + 12;
-    const hpBarY = view.isParty ? infoTop + 16 : y - 14;
+    const infoTop = y + slotH / 2 - (view.isParty ? 76 : 60);
+    const hpBarY = infoTop + 16;
+    const spriteCenterY = view.isParty ? y - 38 : y - 30;
 
     view.rect.setPosition(x, y);
-    view.portrait?.setPosition(x, y - 30);
+    view.shadow.setPosition(x, y + slotH / 2 - 6);
+    view.glow.setPosition(x, y);
+    view.frame.setPosition(x, y);
+    view.portrait?.setPosition(x, spriteCenterY);
     view.nameText.setPosition(x, infoTop);
     view.hpBarBg.setPosition(x, hpBarY);
-    view.hpText.setPosition(x, hpBarY + (view.isParty ? 10 : -11));
+    view.hpText.setPosition(x, hpBarY + 10);
     if (view.vigorBarBg) view.vigorBarBg.setPosition(x, hpBarY + 24);
     if (view.manaBarBg) view.manaBarBg.setPosition(x, hpBarY + 32);
-    view.battleText.setPosition(x, view.isParty ? y + slotH / 2 - 10 : y + 48);
+    view.battleText.setPosition(x, y + slotH / 2 - 10);
 
     const hpFrac = Math.max(0, view.combatant.currentStats.hp / view.combatant.currentStats.hpMax);
     view.hpBarFg.setPosition(x - barW / 2, hpBarY);
@@ -1289,7 +1420,7 @@ export class BattleScene extends Phaser.Scene {
     view.rect.fillColor = combatant.isDown ? DOWN_COLOR : view.baseColor;
 
     // HP bar
-    const barW = SLOT_WIDTH - 16;
+    const barW = (view.isParty ? PARTY_SLOT_WIDTH : SLOT_WIDTH) - 12;
     const hpFrac = combatant.isDown ? 0 : Math.max(0, combatant.currentStats.hp / combatant.currentStats.hpMax);
     const hpColor = hpFrac > 0.4 ? HP_BAR_FG : HP_BAR_FG_LOW;
     view.hpBarFg.width = barW * hpFrac;
@@ -1351,6 +1482,7 @@ export class BattleScene extends Phaser.Scene {
     if (!view) return;
     view.rect.fillColor = DOWN_COLOR;
     view.portrait?.setTint(0x444444);
+    view.shadow.setAlpha(0.2);
     view.hpBarFg.width = 0;
     view.hpText.setText('Caído');
     view.hpText.setColor('#666666');

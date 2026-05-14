@@ -79,11 +79,11 @@ const STAT_LABELS: Record<StatKey, string> = {
 };
 
 const RARITY_COLORS: Record<Rarity, number> = {
-  [Rarity.COMMON]: 0xb9aa8c,
-  [Rarity.UNCOMMON]: 0x78b56f,
-  [Rarity.RARE]: 0x74a8d8,
-  [Rarity.EPIC]: 0xc88dde,
-  [Rarity.CURSED]: 0xc55f65,
+  [Rarity.COMMON]: 0xb0a070,
+  [Rarity.UNCOMMON]: 0x5a9a50,
+  [Rarity.RARE]: 0x5090c8,
+  [Rarity.EPIC]: 0xe8b840,
+  [Rarity.CURSED]: 0xd04040,
 };
 
 const RARITY_LABELS: Record<Rarity, string> = {

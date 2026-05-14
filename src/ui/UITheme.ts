@@ -1,27 +1,27 @@
 // ← CAMBIAR ESTAS DOS LÍNEAS para cambiar el tema visual completo
-const ACCENT_HEX = '#9b8fff'
-const ACCENT_NUM = 0x9b8fff
+const ACCENT_HEX = '#e8b840'
+const ACCENT_NUM = 0xe8b840
 
 export const THEME = {
   // Acento (intercambiable con las dos constantes de arriba)
   accent:        ACCENT_NUM,
   accentHex:     ACCENT_HEX,
-  accentDim:     0x6040c0,
-  accentDimHex:  '#6040c0',
-  accentDeep:    0x3020a0,
-  accentDeepHex: '#3020a0',
+  accentDim:     0xa07830,
+  accentDimHex:  '#a07830',
+  accentDeep:    0x604818,
+  accentDeepHex: '#604818',
 
   // Fondos
-  bgDeep:    0x08080f,
-  bgDeepHex: '#08080f',
-  bgPanel:   0x0d0b18,
-  bgPanelHex:'#0d0b18',
+  bgDeep:    0x0c1428,
+  bgDeepHex: '#0c1428',
+  bgPanel:   0x101c38,
+  bgPanelHex:'#101c38',
 
   // Texto
-  textPrimary:    '#c0b0e0',
-  textPrimaryNum: 0xc0b0e0,
-  textDim:        '#5040a0',
-  textDimNum:     0x5040a0,
+  textPrimary:    '#e8dfc8',
+  textPrimaryNum: 0xe8dfc8,
+  textDim:        '#8a7850',
+  textDimNum:     0x8a7850,
   textAccent:     ACCENT_HEX,
 
   // Colores de juego — NO cambian con el tema
@@ -42,43 +42,43 @@ export const THEME = {
     },
     heading: {
       fontFamily: 'Cinzel, Georgia, serif',
-      fontSize: '32px',
+      fontSize: '36px',
       color: ACCENT_HEX,
       letterSpacing: 4,
     },
     label: {
       fontFamily: 'Cinzel, Georgia, serif',
-      fontSize: '18px',
-      color: '#5040a0',
+      fontSize: '20px',
+      color: '#8a7850',
       letterSpacing: 3,
     },
     button: {
       fontFamily: 'Cinzel, Georgia, serif',
-      fontSize: '20px',
+      fontSize: '22px',
       color: ACCENT_HEX,
       letterSpacing: 2,
     },
     hud: {
       fontFamily: 'Cinzel, Georgia, serif',
-      fontSize: '16px',
-      color: '#c0b0e0',
+      fontSize: '18px',
+      color: '#e8dfc8',
       letterSpacing: 1,
     },
     hudSmall: {
       fontFamily: 'Cinzel, Georgia, serif',
-      fontSize: '13px',
-      color: '#c0b0e0',
+      fontSize: '15px',
+      color: '#e8dfc8',
       letterSpacing: 1,
     },
     body: {
       fontFamily: 'Cormorant Garamond, Georgia, serif',
       fontSize: '20px',
-      color: '#c0b0e0',
+      color: '#e8dfc8',
     },
     dialogue: {
       fontFamily: 'Cormorant Garamond, Georgia, serif',
       fontSize: '22px',
-      color: '#c0b0e0',
+      color: '#e8dfc8',
       fontStyle: 'italic',
     },
   },

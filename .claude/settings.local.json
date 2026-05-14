@@ -16,7 +16,12 @@
       "Bash(Get-ChildItem -Path \"d:\\\\Proyectos\\\\hollow-banner\\\\src\" -Recurse -File -Filter \"*.ts\")",
       "Bash(Measure-Object)",
       "Bash(Select-Object Count)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(bash scripts/start-server.sh --project-dir /Users/martincarrera/Desktop/Proyectos/hollow-banner-game)",
+      "Bash(cp \"/Users/martincarrera/Desktop/Proyectos/hollow-banner-game/.superpowers/brainstorm/5015-1778768666/content/full-preview.html\" \"/Users/martincarrera/Desktop/Proyectos/hollow-banner-game/.superpowers/brainstorm/5670-1778771474/content/full-preview.html\")"
+    ],
+    "additionalDirectories": [
+      "/Users/martincarrera/Desktop/Proyectos/hollow-banner-game/.superpowers/brainstorm/5015-1778768666/content"
     ]
   }
 }

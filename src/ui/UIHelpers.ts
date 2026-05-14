@@ -123,7 +123,7 @@ export function addVignette(
 }
 
 /**
- * Dibuja el fondo base de escena (#08080f).
+ * Dibuja el fondo base de escena (#0c1428).
  */
 export function drawSceneBackground(
   scene: Phaser.Scene,

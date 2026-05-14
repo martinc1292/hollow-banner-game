@@ -1,0 +1,138 @@
+<h2>¿Cómo querés que se vean los paneles y bordes de la UI?</h2>
+<p class="subtitle">Esto afecta ventanas de inventario, diálogos, tarjetas de personaje, menús</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="crystal" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#08080f; padding:20px; border-radius:4px; min-height:200px; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;">
+
+      <!-- Glassmorphism panel -->
+      <div style="background:rgba(80,60,180,0.12); border:1px solid rgba(140,110,255,0.3); border-radius:8px; padding:14px 22px; backdrop-filter:blur(4px); width:85%; text-align:center; box-shadow:0 0 20px rgba(100,70,220,0.15), inset 0 1px 0 rgba(180,160,255,0.1);">
+        <div style="font-size:11px; color:#7060c0; letter-spacing:3px; text-transform:uppercase; margin-bottom:6px;">INVENTARIO</div>
+        <div style="display:flex; gap:8px; justify-content:center;">
+          <div style="width:36px; height:36px; background:rgba(100,80,200,0.2); border:1px solid rgba(140,110,255,0.25); border-radius:4px;"></div>
+          <div style="width:36px; height:36px; background:rgba(100,80,200,0.35); border:1px solid rgba(180,150,255,0.4); border-radius:4px; box-shadow:0 0 10px rgba(140,100,255,0.3);"></div>
+          <div style="width:36px; height:36px; background:rgba(100,80,200,0.2); border:1px solid rgba(140,110,255,0.25); border-radius:4px;"></div>
+        </div>
+      </div>
+
+      <div style="background:rgba(60,40,140,0.15); border:1px solid rgba(120,90,240,0.25); border-radius:6px; padding:10px 18px; width:85%; box-shadow:0 0 15px rgba(80,60,180,0.1);">
+        <div style="font-size:12px; color:#9080d0; font-family:Georgia,serif; font-style:italic;">"Un objeto encontrado en las ruinas..."</div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+          <div style="font-size:10px; color:#6050a0; border:1px solid rgba(120,90,240,0.3); padding:3px 10px; border-radius:3px;">Descartar</div>
+          <div style="font-size:10px; color:#a090e0; border:1px solid rgba(140,110,255,0.4); padding:3px 10px; border-radius:3px; background:rgba(80,60,180,0.2);">Usar</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-body">
+      <h3>Cristal Espectral</h3>
+      <p>Glassmorphism etéreo — paneles translúcidos con brillo interior. Moderno pero misterioso. Transmite que la UI "flota" sobre el mundo.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="rune" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#08080f; padding:20px; border-radius:4px; min-height:200px; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;">
+
+      <!-- Runic stone panel -->
+      <div style="background:#0d0b18; border:2px solid #3a2a70; padding:14px 22px; width:85%; text-align:center; position:relative; clip-path:polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);">
+        <div style="position:absolute; top:-1px; left:50%; transform:translateX(-50%); background:#0d0b18; padding:0 8px;">
+          <div style="font-size:10px; color:#6050a0; letter-spacing:4px;">⬡ INVENTARIO ⬡</div>
+        </div>
+        <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
+          <div style="width:36px; height:36px; background:#100e1c; border:1px solid #3a2a70; display:flex; align-items:center; justify-content:center;">
+            <div style="width:4px; height:4px; background:#5040a0; transform:rotate(45deg);"></div>
+          </div>
+          <div style="width:36px; height:36px; background:#1a1530; border:2px solid #6050b0; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 8px rgba(100,80,180,0.4);">
+            <div style="width:6px; height:6px; background:#9080d0; transform:rotate(45deg); box-shadow:0 0 6px #7060c0;"></div>
+          </div>
+          <div style="width:36px; height:36px; background:#100e1c; border:1px solid #3a2a70; display:flex; align-items:center; justify-content:center;">
+            <div style="width:4px; height:4px; background:#5040a0; transform:rotate(45deg);"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#0d0b18; border:1px solid #3a2a70; border-left:3px solid #7060c0; padding:10px 14px; width:85%;">
+        <div style="font-size:12px; color:#8070c0; font-family:Georgia,serif; font-style:italic;">"Un objeto encontrado en las ruinas..."</div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+          <div style="font-size:10px; color:#5040a0; border:1px solid #3a2a70; padding:3px 10px; clip-path:polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);">Descartar</div>
+          <div style="font-size:10px; color:#b0a0e0; border:1px solid #6050b0; padding:3px 10px; clip-path:polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%); background:#1a1530;">Usar</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-body">
+      <h3>Piedra Rúnica</h3>
+      <p>Bordes angulares, esquinas cortadas, acento en runa o símbolo. Sólido y antiguo. Transmite peso y permanencia, como grabado en roca.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="void" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#08080f; padding:20px; border-radius:4px; min-height:200px; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center;">
+
+      <!-- Void minimal panel -->
+      <div style="background:transparent; border-top:1px solid rgba(140,110,255,0.5); border-bottom:1px solid rgba(140,110,255,0.5); padding:14px 22px; width:85%; text-align:center; position:relative;">
+        <div style="position:absolute; top:0; left:0; width:16px; height:1px; background:#a090ff;"></div>
+        <div style="position:absolute; top:0; left:0; width:1px; height:16px; background:#a090ff;"></div>
+        <div style="position:absolute; top:0; right:0; width:16px; height:1px; background:#a090ff;"></div>
+        <div style="position:absolute; top:0; right:0; width:1px; height:16px; background:#a090ff;"></div>
+        <div style="position:absolute; bottom:0; left:0; width:16px; height:1px; background:#a090ff;"></div>
+        <div style="position:absolute; bottom:0; left:0; width:1px; height:16px; background:#a090ff;"></div>
+        <div style="position:absolute; bottom:0; right:0; width:16px; height:1px; background:#a090ff;"></div>
+        <div style="position:absolute; bottom:0; right:0; width:1px; height:16px; background:#a090ff;"></div>
+        <div style="font-size:11px; color:#7060c0; letter-spacing:4px; text-transform:uppercase; margin-bottom:10px;">INVENTARIO</div>
+        <div style="display:flex; gap:8px; justify-content:center;">
+          <div style="width:36px; height:36px; position:relative;">
+            <div style="position:absolute; top:0; left:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; left:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; right:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; right:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; left:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; left:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; right:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; right:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+          </div>
+          <div style="width:36px; height:36px; position:relative; box-shadow:0 0 12px rgba(140,110,255,0.4);">
+            <div style="position:absolute; top:0; left:0; width:8px; height:1px; background:#a090ff;"></div>
+            <div style="position:absolute; top:0; left:0; width:1px; height:8px; background:#a090ff;"></div>
+            <div style="position:absolute; top:0; right:0; width:8px; height:1px; background:#a090ff;"></div>
+            <div style="position:absolute; top:0; right:0; width:1px; height:8px; background:#a090ff;"></div>
+            <div style="position:absolute; bottom:0; left:0; width:8px; height:1px; background:#a090ff;"></div>
+            <div style="position:absolute; bottom:0; left:0; width:1px; height:8px; background:#a090ff;"></div>
+            <div style="position:absolute; bottom:0; right:0; width:8px; height:1px; background:#a090ff;"></div>
+            <div style="position:absolute; bottom:0; right:0; width:1px; height:8px; background:#a090ff;"></div>
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+              <div style="width:8px; height:8px; background:#a090ff; border-radius:50%; box-shadow:0 0 8px #a090ff;"></div>
+            </div>
+          </div>
+          <div style="width:36px; height:36px; position:relative;">
+            <div style="position:absolute; top:0; left:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; left:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; right:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; top:0; right:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; left:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; left:0; width:1px; height:8px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; right:0; width:8px; height:1px; background:rgba(160,140,255,0.4);"></div>
+            <div style="position:absolute; bottom:0; right:0; width:1px; height:8px; background:#a090ff;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:transparent; padding:10px 14px; width:85%; position:relative;">
+        <div style="position:absolute; top:0; left:0; width:20px; height:1px; background:rgba(160,140,255,0.5);"></div>
+        <div style="position:absolute; bottom:0; right:0; width:20px; height:1px; background:rgba(160,140,255,0.5);"></div>
+        <div style="font-size:12px; color:#8070c0; font-family:Georgia,serif; font-style:italic;">"Un objeto encontrado en las ruinas..."</div>
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:10px;">
+          <div style="font-size:10px; color:#5040a0; letter-spacing:2px; text-transform:uppercase;">Descartar</div>
+          <div style="font-size:10px; color:#c0b0ff; letter-spacing:2px; text-transform:uppercase; border-bottom:1px solid #7060b0;">Usar</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-body">
+      <h3>Vacío Astral</h3>
+      <p>Minimalista puro: sin fondos, solo bordes de esquina y líneas de acento. Limpio y elegante. La UI "desaparece" para que el arte del juego respire.</p>
+    </div>
+  </div>
+
+</div>

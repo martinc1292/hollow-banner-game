@@ -26,15 +26,15 @@ const MAP_BOTTOM = 600;
 
 // Colores semánticos de nodos — no cambian con el tema
 const NODE_COLORS: Record<MapNodeType, number> = {
-  normal: 0x2f5d7c,
-  elite: 0x8f3b36,
-  event: 0x6f628f,
-  shop: 0x8a6b34,
-  camp: 0x4f7a45,
-  treasure: 0xb8903f,
-  miniboss: 0x8b3e55,
-  boss: 0x9b2f2f,
-  special: 0x4e6b75,
+  normal: 0x1e3a5a,
+  elite: 0x6a2020,
+  event: 0x2a3870,
+  shop: 0x8a6020,
+  camp: 0x3a6030,
+  treasure: 0xe8b840,
+  miniboss: 0x6a2040,
+  boss: 0x8a2020,
+  special: 0x2a5060,
 };
 const NODE_LABELS: Record<MapNodeType, string> = {
   normal: 'N',

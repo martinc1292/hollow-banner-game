@@ -46,11 +46,11 @@ const CARD_WIDTH = 330;
 const CARD_HEIGHT = 238;
 const CARD_GAP = 24;
 const RARITY_COLORS = {
-  COMMON: 0xb9aa8c,
-  UNCOMMON: 0x78b56f,
-  RARE: 0x74a8d8,
-  EPIC: 0xc88dde,
-  CURSED: 0xc55f65,
+  COMMON: 0xb0a070,
+  UNCOMMON: 0x5a9a50,
+  RARE: 0x5090c8,
+  EPIC: 0xe8b840,
+  CURSED: 0xd04040,
 } as const;
 
 export class RewardScene extends Phaser.Scene {

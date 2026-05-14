@@ -1,0 +1,191 @@
+<h2>Preview: Overhaul completo — Navy cálido + Dorado</h2>
+<p class="subtitle">Así se vería el juego con la nueva paleta aplicada en todas las áreas. Confirma si esto es lo que buscás antes de escribir el spec.</p>
+
+<!-- Battle Scene -->
+<div class="section">
+<h3>⚔ Escena de Batalla</h3>
+<div class="mockup">
+  <div class="mockup-header">BattleScene</div>
+  <div class="mockup-body" style="background:#0c1428; padding:16px; font-family:Georgia,serif;">
+
+    <!-- Top bar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #2a4060;">
+      <div style="color:#e8dfc8; font-size:13px; letter-spacing:3px; font-weight:bold;">COMBATE</div>
+      <div style="color:#8a7850; font-size:11px; letter-spacing:2px;">TURNO 3 · BRAM</div>
+      <div style="color:#e8b840; font-size:11px; letter-spacing:1px;">Cenizas: 2</div>
+    </div>
+
+    <!-- Party + Enemy bars -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+
+      <!-- Party side -->
+      <div>
+        <div style="color:#8a9ab0; font-size:10px; letter-spacing:2px; margin-bottom:6px; text-transform:uppercase;">Aliados</div>
+        <div style="background:#101c38; border:2px solid #e8b840; border-radius:6px; padding:8px; margin-bottom:6px;">
+          <div style="color:#e8dfc8; font-size:12px; letter-spacing:1px; margin-bottom:4px; font-weight:bold;">BRAM  <span style="color:#e8b840; font-size:10px;">◆ turno activo</span></div>
+          <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">HP</span>
+            <div style="background:#1a0a0a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#3cb371; width:80%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">48/60</span>
+          </div>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">VIG</span>
+            <div style="background:#0a0a1a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#4a90d9; width:45%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">9/20</span>
+          </div>
+        </div>
+        <div style="background:#101c38; border:1px solid #2a4060; border-radius:6px; padding:8px;">
+          <div style="color:#c8b890; font-size:12px; letter-spacing:1px; margin-bottom:4px;">MIRA</div>
+          <div style="display:flex; gap:4px; align-items:center; margin-bottom:3px;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">HP</span>
+            <div style="background:#1a0a0a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#3cb371; width:55%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">33/60</span>
+          </div>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">MAN</span>
+            <div style="background:#0a0a1a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#9b59b6; width:70%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">28/40</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enemy side -->
+      <div>
+        <div style="color:#8a9ab0; font-size:10px; letter-spacing:2px; margin-bottom:6px; text-transform:uppercase;">Enemigos</div>
+        <div style="background:#1c1018; border:1px solid #4a2028; border-radius:6px; padding:8px; margin-bottom:6px;">
+          <div style="color:#e8b0a0; font-size:12px; letter-spacing:1px; margin-bottom:4px;">ESPECTRO</div>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">HP</span>
+            <div style="background:#1a0a0a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#d94f2e; width:40%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">16/40</span>
+          </div>
+        </div>
+        <div style="background:#1c1018; border:1px solid #4a2028; border-radius:6px; padding:8px;">
+          <div style="color:#e8b0a0; font-size:12px; letter-spacing:1px; margin-bottom:4px;">SOMBRA</div>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <span style="color:#8a9ab0; font-size:10px; width:20px;">HP</span>
+            <div style="background:#1a0a0a; height:5px; border-radius:3px; flex:1;">
+              <div style="background:#3cb371; width:90%; height:5px; border-radius:3px;"></div>
+            </div>
+            <span style="color:#e8dfc8; font-size:10px; width:30px; text-align:right;">54/60</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action menu -->
+    <div style="border-top:1px solid #2a4060; padding-top:12px;">
+      <div style="color:#8a7850; font-size:10px; letter-spacing:2px; margin-bottom:8px; text-transform:uppercase;">Acciones — Bram</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+        <div style="background:#101c38; border:1px solid #e8b840; border-radius:5px; padding:8px; text-align:center;">
+          <div style="color:#e8b840; font-size:12px; letter-spacing:1px; font-weight:bold;">⚔ ATACAR</div>
+        </div>
+        <div style="background:#101c38; border:1px solid #2a4060; border-radius:5px; padding:8px; text-align:center;">
+          <div style="color:#c8b890; font-size:12px; letter-spacing:1px;">✦ HABILIDAD</div>
+        </div>
+        <div style="background:#101c38; border:1px solid #2a4060; border-radius:5px; padding:8px; text-align:center;">
+          <div style="color:#c8b890; font-size:12px; letter-spacing:1px;">🎒 ITEM</div>
+        </div>
+        <div style="background:#101c38; border:1px solid #2a4060; border-radius:5px; padding:8px; text-align:center;">
+          <div style="color:#c8b890; font-size:12px; letter-spacing:1px;">↩ ESPERAR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Map Scene -->
+<div class="section">
+<h3>🗺 Mapa del Acto</h3>
+<div class="mockup">
+  <div class="mockup-header">MapScene — Nodos actualizados a tono navy+dorado</div>
+  <div class="mockup-body" style="background:#0a1020; padding:16px; font-family:Georgia,serif;">
+    <div style="color:#e8dfc8; font-size:13px; letter-spacing:3px; margin-bottom:14px; text-align:center; font-weight:bold;">ACTO I · EL UMBRAL</div>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="background:#1e3a5a; border:2px solid #4a8abf; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#90c0e8; font-size:16px;">⚔</span>
+        </div>
+        <div style="color:#7090b0; font-size:10px;">Combate</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="background:#3a1818; border:2px solid #a04040; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#e06060; font-size:16px;">☠</span>
+        </div>
+        <div style="color:#a06060; font-size:10px;">Elite</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="background:#1a2a40; border:2px solid #4a70a0; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#80b0d8; font-size:16px;">📜</span>
+        </div>
+        <div style="color:#6090b0; font-size:10px;">Evento</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="background:#2a1e08; border:2px solid #c89830; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#e8b840; font-size:16px;">🏪</span>
+        </div>
+        <div style="color:#a07830; font-size:10px;">Tienda</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="background:#142014; border:2px solid #3a7a3a; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#70c070; font-size:16px;">⛺</span>
+        </div>
+        <div style="color:#508050; font-size:10px;">Campamento</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="background:#241808; border:2px solid #e8c040; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;">
+          <span style="color:#f0d060; font-size:16px;">💎</span>
+        </div>
+        <div style="color:#c0a030; font-size:10px;">Tesoro</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Inventory / Rarity -->
+<div class="section">
+<h3>🎒 Inventario — Colores de rareza</h3>
+<div class="mockup">
+  <div class="mockup-header">InventoryScene — Rareza de items</div>
+  <div class="mockup-body" style="background:#0c1428; padding:16px; font-family:Georgia,serif;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+      <div style="background:#101c38; border:1px solid #b0a880; border-radius:6px; padding:10px;">
+        <div style="color:#c8b890; font-size:11px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">Común</div>
+        <div style="color:#e8dfc8; font-size:13px;">Espada Herrumbrosa</div>
+      </div>
+      <div style="background:#101c38; border:1px solid #5a9a5a; border-radius:6px; padding:10px;">
+        <div style="color:#70c070; font-size:11px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">Poco común</div>
+        <div style="color:#e8dfc8; font-size:13px;">Daga de Sombra</div>
+      </div>
+      <div style="background:#101c38; border:1px solid #4a80c8; border-radius:6px; padding:10px;">
+        <div style="color:#80b0e8; font-size:11px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">Raro</div>
+        <div style="color:#e8dfc8; font-size:13px;">Bastón Arcano</div>
+      </div>
+      <div style="background:#101c38; border:1px solid #d4a840; border-radius:6px; padding:10px;">
+        <div style="color:#e8b840; font-size:11px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">Épico</div>
+        <div style="color:#e8dfc8; font-size:13px;">Corona del Vacío</div>
+      </div>
+      <div style="background:#101c38; border:1px solid #c04040; border-radius:6px; padding:10px; grid-column:1/-1;">
+        <div style="color:#e05050; font-size:11px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">Maldito</div>
+        <div style="color:#e8dfc8; font-size:13px;">Anillo del Olvido</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="section" style="text-align:center; margin-top:16px;">
+  <p class="subtitle">¿Este diseño general te convence? Respondé en el terminal para continuar al spec.</p>
+</div>
