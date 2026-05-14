@@ -139,10 +139,8 @@ export class SkillExecutor {
         }
 
         case 'apply_status':
-          // Delegated to BattleManager.applyStatus via the returned result —
-          // SkillExecutor doesn't own the status registry call. We mark the
-          // effect so BattleManager can iterate hits and apply statuses.
-          // Handled externally; see BattleManager.performSkill.
+        case 'purge_negative':
+          // Delegated to BattleManager — handled externally in performSkill.
           break;
 
         case 'buff': {

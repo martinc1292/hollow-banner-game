@@ -25,6 +25,7 @@ export type SkillEffectType =
   | 'damage'
   | 'heal'
   | 'apply_status'
+  | 'purge_negative'
   | 'buff'
   | 'block'
   | 'gain_resource';

@@ -11,7 +11,13 @@ export interface RunMeta {
   relics: string[];
   relicChoices: Record<string, string>;
   skipNextFreeNode: boolean;
+  activeCombat: ActiveCombat | null;
   seed?: MapSeed;
+}
+
+export interface ActiveCombat {
+  encounterId: string;
+  nodeId: string | null;
 }
 
 interface AddItemOptions {
@@ -112,6 +118,17 @@ class GameState {
 
   scheduleSkipNextFreeNode(): void {
     this.runMeta.skipNextFreeNode = true;
+  }
+
+  beginCombat(encounterId: string): void {
+    this.runMeta.activeCombat = {
+      encounterId,
+      nodeId: this.currentMap?.currentNodeId ?? null,
+    };
+  }
+
+  clearActiveCombat(): void {
+    this.runMeta.activeCombat = null;
   }
 
   consumeSkipNextFreeNode(): string | null {
@@ -236,6 +253,7 @@ function createInitialRunMeta(seed?: MapSeed): RunMeta {
     relics: [],
     relicChoices: {},
     skipNextFreeNode: false,
+    activeCombat: null,
     seed,
   };
 }

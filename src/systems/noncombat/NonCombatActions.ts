@@ -146,6 +146,12 @@ export function damageParty(amount: number): number {
   return totalDamage;
 }
 
+export function modifyPartyStat(stat: StatKey, amount: number): void {
+  for (const member of ensureRunParty()) {
+    modifyCharacterStat(member, stat, amount);
+  }
+}
+
 export function modifyCharacterStat(
   character: CharacterInstance,
   stat: StatKey,

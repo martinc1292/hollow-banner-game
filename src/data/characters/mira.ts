@@ -21,11 +21,11 @@ export const mira: CharacterData = {
   },
   baseResources: {
     vigor: 0,
-    vigorMax: 8,
-    mana: 5,
-    manaMax: 10,
+    vigorMax: 10,
+    mana: 0,
+    manaMax: 0,
   },
-  usesMana: true,
+  usesMana: false,
   skillIds: [
     'mira_basic',
     'mira_llamarada',

@@ -13,9 +13,13 @@ import {
 import { bram } from './characters/bram';
 import { vera } from './characters/vera';
 import { mira } from './characters/mira';
+import { aren } from './characters/aren';
+import { lyra } from './characters/lyra';
 import { bramSkills } from './skills/bramSkills';
 import { veraSkills } from './skills/veraSkills';
 import { miraSkills } from './skills/miraSkills';
+import { arenSkills } from './skills/arenSkills';
+import { lyraSkills } from './skills/lyraSkills';
 import { items } from './items/items';
 import { sets } from './sets/sets';
 import { statusEffects } from './statusEffects/statusEffects';
@@ -41,11 +45,11 @@ export class Registry {
   private events = new Map<string, EventData>();
 
   constructor() {
-    for (const character of [bram, vera, mira]) {
+    for (const character of [bram, vera, mira, aren, lyra]) {
       this.characters.set(character.id, character);
     }
 
-    for (const skill of [...bramSkills, ...veraSkills, ...miraSkills]) {
+    for (const skill of [...bramSkills, ...veraSkills, ...miraSkills, ...arenSkills, ...lyraSkills]) {
       this.registerSkill(skill);
     }
 

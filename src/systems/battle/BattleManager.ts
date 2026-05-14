@@ -143,10 +143,14 @@ const DEFEND_BONUS = 5;
 const BRAM_ID = 'bram';
 const VERA_ID = 'vera';
 const MIRA_ID = 'mira';
+const AREN_ID = 'aren';
+const LYRA_ID = 'lyra';
 const BRAM_NATIVE_ID = 'bram_native_juramento';
 const BRAM_PASSIVE_ID = 'bram_passive_voto';
 const VERA_NATIVE_ID = 'vera_native_sed';
 const MIRA_NATIVE_ID = 'mira_native_ceniza';
+const AREN_PASSIVE_ID = 'aren_passive_susurro';
+const LYRA_PASSIVE_ID = 'lyra_passive_ojos';
 const VERA_PASSIVE_ID = 'vera_passive_frenesi';
 const MIRA_ULT_ID = 'mira_ult_pira';
 const MAX_ASHES = 5;
@@ -292,6 +296,33 @@ export class BattleManager {
         });
       }
 
+      if (member.data.id === AREN_ID && this.hasSkill(member, AREN_PASSIVE_ID)) {
+        this.passiveHooks.register(AREN_ID, PassiveHookType.ON_ALLY_DOWN, (context) => {
+          const fallen = context.target;
+          if (
+            !fallen
+            || !isCharacterInstance(fallen)
+            || fallen === member
+            || member.isDown
+          ) {
+            return;
+          }
+
+          const runtime = ensureBattleRuntime(member);
+          if (runtime.arenSusurroTriggered) return;
+
+          runtime.arenSusurroTriggered = true;
+          fallen.isDown = false;
+          fallen.currentStats.hp = 1;
+          this.events.emit(BattleEvents.HEALED, {
+            source: member,
+            target: fallen,
+            amount: 1,
+            reason: AREN_PASSIVE_ID,
+          } as HealedEvent);
+        });
+      }
+
       if (member.data.id === MIRA_ID && this.hasSkill(member, MIRA_NATIVE_ID)) {
         this.passiveHooks.register(MIRA_ID, PassiveHookType.ON_RESOURCE_SPENT, (context) => {
           if (
@@ -328,6 +359,7 @@ export class BattleManager {
     this.calculateEnemyIntents();
     this.state.turnQueue = this.buildTurnQueue();
     this.markStoppedClockEnemy();
+    this.markLyraOjosLentos();
     this.state.currentActorIndex = -1;
     this.events.emit(BattleEvents.ROUND_STARTED, this.state.currentRound);
     this.nextTurn();
@@ -520,12 +552,20 @@ export class BattleManager {
       this.emitUnitDied(dead, actor);
     }
 
-    // Apply status effects defined in the skill effects list.
+    // Apply / remove status effects defined in the skill effects list.
     for (const effect of skill.effects) {
       if (effect.type === 'apply_status' && effect.statusId) {
         for (const t of targets) {
           if (!t.isDown) {
             this.applyStatus(t, effect.statusId, effect.stacks ?? 1, actor);
+          }
+        }
+      }
+      if (effect.type === 'purge_negative') {
+        for (const t of targets) {
+          if (!t.isDown && isCharacterInstance(t)) {
+            const removed = this.statusManager.purgeNegative(t);
+            removed.forEach((r) => this.emitStatusRemoval(r));
           }
         }
       }
@@ -857,6 +897,21 @@ export class BattleManager {
       return;
     }
 
+    if (intent.type === 'heal') {
+      for (const target of this.resolveEnemyHealTargets(enemy, intent.targetType)) {
+        if (!target.isDown) {
+          const before = target.currentStats.hp;
+          target.currentStats.hp = Math.min(target.currentStats.hpMax, target.currentStats.hp + intent.value);
+          const healed = target.currentStats.hp - before;
+          if (healed > 0) {
+            this.emitHealResult(enemy, target, healed, 'enemy_heal');
+          }
+        }
+      }
+      this.finishActorTurn(enemy);
+      return;
+    }
+
     if (intent.type === 'attack') {
       const targets = this.resolveEnemyIntentTargets(enemy, intent.targetType)
         .filter((t) => !t.isDown && t !== enemy);
@@ -976,6 +1031,24 @@ export class BattleManager {
     return [this.redirectTauntIfNeeded(target)];
   }
 
+  /** Resolve heal targets from the enemy's own side (other enemies). */
+  private resolveEnemyHealTargets(
+    healer: EnemyInstance,
+    targetType: EnemyIntentTargetType,
+  ): EnemyInstance[] {
+    const alive = this.state.enemies.filter((e) => !e.isDown);
+    if (alive.length === 0) return [];
+
+    if (targetType === 'ally_lowest_hp') {
+      const target = alive.reduce((min, e) => (
+        e.currentStats.hp < min.currentStats.hp ? e : min
+      ));
+      return [target];
+    }
+
+    return [healer];
+  }
+
   private redirectTauntIfNeeded(target: CharacterInstance): CharacterInstance {
     const tauntingMember = this.state.party.find(
       (p) => !p.isDown && ensureBattleRuntime(p).tauntActive,
@@ -1042,6 +1115,11 @@ export class BattleManager {
 
     if (isCharacterInstance(unit)) {
       this.triggerHollowMirror(unit);
+      this.passiveHooks.trigger(PassiveHookType.ON_ALLY_DOWN, {
+        state: this.state,
+        target: unit,
+        source,
+      });
     }
 
     if (!source) return;
@@ -1095,6 +1173,13 @@ export class BattleManager {
       ).length;
 
       multiplier += bleedingEnemies * 0.1;
+    }
+    if (
+      source.data.id === LYRA_ID
+      && this.hasSkill(source, LYRA_PASSIVE_ID)
+      && ensureBattleRuntime(source).lyraOjosFirstThisRound
+    ) {
+      multiplier += 0.2;
     }
     if (gameState.hasRelic('craneo_cuervo')) {
       multiplier += 0.3;
@@ -1227,6 +1312,18 @@ export class BattleManager {
       default:
         return 2;
     }
+  }
+
+  private markLyraOjosLentos(): void {
+    const lyra = this.state.party.find(
+      (p) => !p.isDown && p.data.id === LYRA_ID && this.hasSkill(p, LYRA_PASSIVE_ID),
+    );
+    if (!lyra) return;
+
+    const firstInQueue = this.state.turnQueue[0];
+    const lyraIsFirst = firstInQueue === lyra;
+
+    ensureBattleRuntime(lyra).lyraOjosFirstThisRound = lyraIsFirst;
   }
 
   private markStoppedClockEnemy(): void {

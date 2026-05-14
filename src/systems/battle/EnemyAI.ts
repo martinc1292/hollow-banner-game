@@ -38,6 +38,7 @@ export class EnemyAI {
       case 'all_allies':
         return alive[0];
       case 'self':
+      case 'ally_lowest_hp':
         return null;
     }
   }

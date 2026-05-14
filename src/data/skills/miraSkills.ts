@@ -10,14 +10,14 @@ const miraLlamaradaPlus: SkillData = {
   id: 'mira_llamarada_plus',
   name: 'Llamarada+',
   type: SkillType.ACTIVE,
-  costType: ResourceCost.MANA,
-  costAmount: 2,
+  costType: ResourceCost.VIGOR,
+  costAmount: 3,
   target: SkillTarget.SINGLE_ENEMY,
   effects: [
     { type: 'damage', amount: 11, scalingStat: 'power', scalingMultiplier: 1.0 },
     { type: 'apply_status', statusId: StatusEffectId.BURN, stacks: 3 },
   ],
-  description: '11 dano magico a un enemigo + Quemadura (3 stacks).',
+  description: '11 daño mágico a un enemigo + Quemadura (3 stacks).',
   characterId: 'mira',
 };
 
@@ -25,14 +25,14 @@ const miraTormentaPlus: SkillData = {
   id: 'mira_tormenta_plus',
   name: 'Tormenta de Brasas+',
   type: SkillType.ACTIVE,
-  costType: ResourceCost.MANA,
-  costAmount: 4,
+  costType: ResourceCost.VIGOR,
+  costAmount: 5,
   target: SkillTarget.ALL_ENEMIES,
   effects: [
     { type: 'damage', amount: 6, scalingStat: 'power', scalingMultiplier: 1.0 },
     { type: 'apply_status', statusId: StatusEffectId.BURN, stacks: 2 },
   ],
-  description: '6 dano magico AoE + Quemadura (2 stacks) a todos.',
+  description: '6 daño mágico AoE + Quemadura (2 stacks) a todos.',
   characterId: 'mira',
 };
 
@@ -41,7 +41,7 @@ const miraVeloHumoPlus: SkillData = {
   name: 'Velo de Humo+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 2,
+  costAmount: 3,
   target: SkillTarget.SINGLE_ENEMY,
   effects: [
     { type: 'apply_status', statusId: StatusEffectId.VULNERABLE, stacks: 1 },
@@ -50,6 +50,7 @@ const miraVeloHumoPlus: SkillData = {
   description: 'Aplica Vulnerable y Marcado a un enemigo.',
   characterId: 'mira',
 };
+
 
 export const miraSkills: SkillData[] = [
   {
@@ -71,7 +72,7 @@ export const miraSkills: SkillData[] = [
     id: 'mira_llamarada',
     name: 'Llamarada',
     type: SkillType.ACTIVE,
-    costType: ResourceCost.MANA,
+    costType: ResourceCost.VIGOR,
     costAmount: 2,
     target: SkillTarget.SINGLE_ENEMY,
     effects: [
@@ -86,7 +87,7 @@ export const miraSkills: SkillData[] = [
     id: 'mira_tormenta',
     name: 'Tormenta de Brasas',
     type: SkillType.ACTIVE,
-    costType: ResourceCost.MANA,
+    costType: ResourceCost.VIGOR,
     costAmount: 4,
     target: SkillTarget.ALL_ENEMIES,
     effects: [
@@ -115,7 +116,7 @@ export const miraSkills: SkillData[] = [
     id: 'mira_ult_pira',
     name: 'Pira Hueca',
     type: SkillType.ULTIMATE,
-    costType: ResourceCost.MANA,
+    costType: ResourceCost.VIGOR,
     costAmount: 10,
     target: SkillTarget.ALL_ENEMIES,
     effects: [

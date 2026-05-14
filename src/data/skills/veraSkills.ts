@@ -11,7 +11,7 @@ const veraTajoDoblePlus: SkillData = {
   name: 'Tajo Doble+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 2,
+  costAmount: 3,
   target: SkillTarget.SINGLE_ENEMY,
   effects: [
     { type: 'damage', amount: 6, scalingStat: 'attack', scalingMultiplier: 1.0 },
@@ -27,7 +27,7 @@ const veraCorteProfundoPlus: SkillData = {
   name: 'Corte Profundo+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 3,
+  costAmount: 4,
   target: SkillTarget.SINGLE_ENEMY,
   effects: [
     { type: 'damage', amount: 12, scalingStat: 'attack', scalingMultiplier: 1.0 },
@@ -42,7 +42,7 @@ const veraDanzaAceroPlus: SkillData = {
   name: 'Danza de Acero+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 4,
+  costAmount: 5,
   target: SkillTarget.RANDOM_ENEMIES,
   effects: [
     { type: 'damage', amount: 7, scalingStat: 'attack', scalingMultiplier: 1.0 },

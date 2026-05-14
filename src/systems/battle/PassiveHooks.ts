@@ -9,6 +9,7 @@ export enum PassiveHookType {
   ON_TURN_START = 'ON_TURN_START',
   ON_HP_THRESHOLD = 'ON_HP_THRESHOLD',
   ON_RESOURCE_SPENT = 'ON_RESOURCE_SPENT',
+  ON_ALLY_DOWN = 'ON_ALLY_DOWN',
 }
 
 export interface PassiveHookContext {

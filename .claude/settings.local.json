@@ -12,7 +12,11 @@
       "Bash(not exist *)",
       "Bash(Get-ChildItem -Path \"d:\\\\Proyectos\\\\hollow-banner\\\\src\\\\data\\\\enemies\\\\\" -File)",
       "Bash(cat)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Proyectos\\\\hollow-banner\\\\src\" -Recurse -File -Filter \"*.ts\")",
+      "Bash(Measure-Object)",
+      "Bash(Select-Object Count)",
+      "Bash(npx vite *)"
     ]
   }
 }

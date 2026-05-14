@@ -105,14 +105,14 @@ export class TreasureScene extends Phaser.Scene {
 
     const trapped = Math.random() < TRAP_CHANCE;
     const itemResult = trapped
-      ? addRolledItem({ rarity: Rarity.UNCOMMON, relicOnly: true })
+      ? addRolledItem({ rarity: Rarity.CURSED, relicOnly: true })
       : addRolledItem({ rarity: Rarity.RARE, relicOnly: true });
 
     if (trapped) {
       addStatusToParty(StatusEffectId.BLEED, 3, 3);
       this.showResult(
         'Trampa',
-        `La cerradura sangra. Toda la party recibe Sangrado x3.\nReliquia: ${itemResult.item.name}.`,
+        `La cerradura sangra. Toda la party recibe Sangrado x3.\nReliquia maldita: ${itemResult.item.name}.`,
         itemResult.item,
       );
     } else {

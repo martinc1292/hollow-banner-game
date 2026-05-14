@@ -121,6 +121,23 @@ export const intentPatterns: Record<string, IntentPatternFn> = {
     }
   },
 
+  healer_support: (enemy, _state, round) => {
+    if (round % 3 === 0) {
+      return {
+        type: 'attack',
+        targetType: 'single_ally',
+        value: enemy.currentStats.attack,
+        description: 'Ataca al aliado con menos HP',
+      };
+    }
+    return {
+      type: 'heal',
+      targetType: 'ally_lowest_hp',
+      value: 6,
+      description: 'Plegaria: cura 6 al aliado más herido',
+    };
+  },
+
   padre_oxidado: (enemy, _state, round) => {
     if (enemy.phase >= 2) {
       if (round % 3 === 0) {

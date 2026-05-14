@@ -11,7 +11,7 @@ const bramProvocarPlus: SkillData = {
   name: 'Provocar+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 1,
+  costAmount: 2,
   target: SkillTarget.SELF,
   effects: [
     { type: 'buff', amount: 30 },
@@ -25,7 +25,7 @@ const bramEscudoHierroPlus: SkillData = {
   name: 'Escudo de Hierro+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 3,
+  costAmount: 4,
   target: SkillTarget.SINGLE_ALLY,
   effects: [
     { type: 'block', amount: 18 },
@@ -40,7 +40,7 @@ const bramEmbestidaPlus: SkillData = {
   name: 'Embestida+',
   type: SkillType.ACTIVE,
   costType: ResourceCost.VIGOR,
-  costAmount: 2,
+  costAmount: 3,
   target: SkillTarget.SINGLE_ENEMY,
   effects: [
     { type: 'damage', amount: 10, scalingStat: 'attack', scalingMultiplier: 1.0 },

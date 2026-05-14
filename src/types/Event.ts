@@ -17,6 +17,7 @@ export type EventEffect =
       category?: ItemCategory;
       rarity?: Rarity;
       relicOnly?: boolean;
+      includeCursed?: boolean;
     }
   | { type: 'lose_item'; itemId: string }
   | { type: 'gain_status_party'; statusId: StatusEffectId; stacks: number; duration: number }
@@ -24,6 +25,7 @@ export type EventEffect =
   | { type: 'damage_party'; amount: number }
   | { type: 'modify_character_stat'; characterId: string; stat: StatKey; amount: number }
   | { type: 'modify_random_character_stat'; amount: number; stats: StatKey[] }
+  | { type: 'modify_party_stat'; stat: StatKey; amount: number }
   | { type: 'skip_next_free_node' }
   | { type: 'recruit'; characterId: string }
   | { type: 'trigger_combat'; encounterId: string };

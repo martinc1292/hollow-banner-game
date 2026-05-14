@@ -120,6 +120,7 @@ export class SaveManager {
       relics: [...data.runMeta.relics],
       relicChoices: { ...data.runMeta.relicChoices },
       skipNextFreeNode: data.runMeta.skipNextFreeNode,
+      activeCombat: data.runMeta.activeCombat ?? null,
       seed: data.runMeta.seed,
     };
 

@@ -13,6 +13,6 @@ export const peregrinoVacio: EnemyData = {
     crit: 3,
     resistance: 8,
   },
-  intentPattern: 'defensive',
-  description: 'Un viajero sin destino. Cada tercer paso retrocede y se cubre.',
+  intentPattern: 'healer_support',
+  description: 'Un viajero sin destino. Cura a sus aliados con plegarias, pero ataca cuando acorralan al grupo.',
 };

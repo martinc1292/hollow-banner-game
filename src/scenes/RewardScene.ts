@@ -207,6 +207,7 @@ export class RewardScene extends Phaser.Scene {
 
     this.resolved = true;
     if (this.summary.demoComplete) {
+      gameState.clearActiveCombat();
       const mapState = gameState.currentMap;
       const currentNode = mapState?.getCurrentNode();
       if (mapState && currentNode && !currentNode.completed) {
@@ -216,6 +217,7 @@ export class RewardScene extends Phaser.Scene {
       return;
     }
 
+    gameState.clearActiveCombat();
     this.scene.start(SceneKeys.MAP, { completedCombat: true });
   }
 
@@ -438,6 +440,7 @@ export class RewardScene extends Phaser.Scene {
 
     this.resolved = true;
     this.showFeedback(message);
+    gameState.clearActiveCombat();
     saveManager.save();
     this.time.delayedCall(650, () => {
       this.scene.start(SceneKeys.MAP, { completedCombat: true });

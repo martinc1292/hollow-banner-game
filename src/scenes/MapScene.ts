@@ -76,11 +76,14 @@ export class MapScene extends Phaser.Scene {
     const mapState = gameState.ensureAct1Map();
 
     if (this.pendingCombatCompletion) {
+      gameState.clearActiveCombat();
       const completedNode = mapState.getCurrentNode();
       if (completedNode && !completedNode.completed) {
         mapState.completeNode(completedNode.id);
       }
       saveManager.save();
+    } else if (this.returnToActiveCombat()) {
+      return;
     }
 
     const currentNode = mapState.getCurrentNode();
@@ -294,6 +297,10 @@ export class MapScene extends Phaser.Scene {
   }
 
   private handleNodeClick(nodeId: string): void {
+    if (this.returnToActiveCombat()) {
+      return;
+    }
+
     const mapState = gameState.ensureAct1Map();
     const node = mapState.moveToNode(nodeId);
 
@@ -339,6 +346,17 @@ export class MapScene extends Phaser.Scene {
     };
 
     this.scene.start(SceneKeys.BATTLE, data);
+  }
+
+  private returnToActiveCombat(): boolean {
+    const activeCombat = gameState.runMeta.activeCombat;
+    if (!activeCombat) return false;
+
+    this.scene.start(SceneKeys.BATTLE, {
+      party: this.getPartyForBattle(),
+      encounterId: activeCombat.encounterId,
+    });
+    return true;
   }
 
   private getPartyForBattle(): BattleSceneInitData['party'] {

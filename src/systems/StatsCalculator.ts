@@ -3,7 +3,6 @@ import { gameState } from '@/systems/GameState';
 import {
   EquipmentSlot,
   ItemCategory,
-  StatusEffectId,
   type CharacterEquipment,
   type CharacterInstance,
   type ItemEffect,
@@ -226,24 +225,15 @@ function getEquippedItemIds(equipment: CharacterEquipment): string[] {
     .filter((itemId): itemId is string => Boolean(itemId))
 }
 
-function applyStatusModifiers(stats: Stats, statusEffects: StatusEffectInstance[]): void {
-  for (const status of statusEffects) {
-    switch (status.id) {
-      case StatusEffectId.WEAKENED:
-      case StatusEffectId.PROTECTED:
-      case StatusEffectId.INSPIRED:
-      case StatusEffectId.VULNERABLE:
-      case StatusEffectId.STUN:
-      case StatusEffectId.MARKED:
-      case StatusEffectId.BLEED:
-      case StatusEffectId.BURN:
-      case StatusEffectId.POISON:
-      case StatusEffectId.REGEN:
-        break;
-    }
-  }
-
-  clampStats(stats);
+// Status effects that modify damage output/intake (VULNERABLE, WEAKENED, PROTECTED) are
+// applied as multipliers in DamageCalculator.calculateDamage, not as stat mutations here.
+// Modifying base stats here would cause a double-application and break all damage math.
+// DoT effects (BLEED, BURN, POISON, REGEN) are handled by StatusEffectManager tick logic.
+// Turn-skipping (STUN) is handled via BattleRuntime.skipTurnOnce.
+// This function intentionally leaves stats unchanged; it exists as a hook for any future
+// effects that genuinely need to mutate a stat (e.g. a hypothetical "Slowed" that cuts speed).
+function applyStatusModifiers(_stats: Stats, _statusEffects: StatusEffectInstance[]): void {
+  // No stat mutations needed for current status effect set — see comment above.
 }
 
 function clampStats(stats: Stats): Stats {

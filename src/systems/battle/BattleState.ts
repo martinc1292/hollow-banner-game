@@ -33,6 +33,10 @@ export interface BattleRuntime {
   tauntActive: boolean;
   tauntCharges: number;
   skipTurnOnce: boolean;
+  /** Susurro Final: Aren revive un aliado a 1 HP una vez por combate. */
+  arenSusurroTriggered: boolean;
+  /** Ojos Lentos: true cuando Lyra es la primera en actuar en el round actual. */
+  lyraOjosFirstThisRound: boolean;
 }
 
 declare module '@/types' {
@@ -65,6 +69,8 @@ function createBattleRuntime(): BattleRuntime {
     tauntActive: false,
     tauntCharges: 0,
     skipTurnOnce: false,
+    arenSusurroTriggered: false,
+    lyraOjosFirstThisRound: false,
   };
 }
 

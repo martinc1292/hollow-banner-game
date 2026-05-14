@@ -12,6 +12,7 @@ import {
   healPartyByAmount,
   healPartyByPercent,
   modifyCharacterStat,
+  modifyPartyStat,
   statLabel,
 } from '@/systems/noncombat/NonCombatActions';
 import { saveManager } from '@/systems/SaveManager';
@@ -240,6 +241,15 @@ export class EventScene extends Phaser.Scene {
       case 'modify_random_character_stat':
         return this.applyRandomStatEffect(effect.stats, effect.amount);
 
+      case 'modify_party_stat': {
+        modifyPartyStat(effect.stat, effect.amount);
+        const sign = effect.amount > 0 ? '+' : '';
+        return {
+          message: `Toda la party ${sign}${effect.amount} ${statLabel(effect.stat)}.`,
+          combatEncounterId: null,
+        };
+      }
+
       case 'skip_next_free_node':
         gameState.scheduleSkipNextFreeNode();
         return {
@@ -268,6 +278,7 @@ export class EventScene extends Phaser.Scene {
         category: effect.category,
         rarity: effect.rarity,
         relicOnly: effect.relicOnly,
+        includeCursed: effect.includeCursed,
       }).item;
     }
 

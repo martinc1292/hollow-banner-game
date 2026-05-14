@@ -3,6 +3,7 @@ import { SceneKeys } from '@/config/SceneKeys';
 import { makeTextButton } from '@/ui/TextButton';
 import { registry } from '@/data/Registry';
 import { gameState } from '@/systems/GameState';
+import { saveManager } from '@/systems/SaveManager';
 import { soundManager } from '@/systems/SoundManager';
 import {
   awardXp,
@@ -74,7 +75,6 @@ const SLOT_SPACING = 20;
 const ROW_ENEMY_Y = 210;          // centro de los slots de enemigos
 const ROW_PARTY_Y = 430;          // centro de los slots del party
 const ROW_ACTIONS_Y = 590;        // fila de botones de acción
-const ROW_NAV_Y = 650;            // fila de botones de navegación (Volver al mapa, etc.)
 
 const PORTRAIT_ASSETS: Record<string, string> = {
   bram: 'battle_portrait_bram',
@@ -210,6 +210,9 @@ export class BattleScene extends Phaser.Scene {
     }
 
     this.activeEncounter = registry.getEncounter(this.pendingEncounterId ?? DEFAULT_ENCOUNTER_ID);
+    gameState.beginCombat(this.activeEncounter.id);
+    saveManager.save();
+
     const enemies = this.buildEnemiesFromEncounter(this.activeEncounter);
 
     this.state = new BattleState();
@@ -610,11 +613,6 @@ export class BattleScene extends Phaser.Scene {
         this.ultimateButton = btn;
       }
     });
-
-    // ── Navigation strip ─────────────────────────────────────────────────────
-    makeTextButton(this, width / 2, ROW_NAV_Y, 'Volver al mapa', () => {
-      this.scene.start(SceneKeys.MAP);
-    }, { fontSize: '16px', color: '#7a6a50', fontFamily: 'Georgia, serif' });
 
     this.input.keyboard?.on('keydown-ESC', () => this.handleCancel());
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
@@ -1407,6 +1405,8 @@ export class BattleScene extends Phaser.Scene {
         return '🛡';
       case 'buff':
         return '↑';
+      case 'heal':
+        return `✚ ${intent.value}`;
     }
   }
 

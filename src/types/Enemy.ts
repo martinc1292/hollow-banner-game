@@ -1,7 +1,7 @@
 import type { Stats } from './Stats';
 import type { StatusEffectId, StatusEffectInstance } from './StatusEffect';
 
-export type EnemyIntentType = 'attack' | 'buff' | 'apply_status' | 'defend';
+export type EnemyIntentType = 'attack' | 'buff' | 'apply_status' | 'defend' | 'heal';
 
 export type EnemyIntentTargetType =
   | 'single_ally'
@@ -9,7 +9,8 @@ export type EnemyIntentTargetType =
   | 'lowest_speed_ally'
   | 'all_allies'
   | 'self'
-  | 'random_enemy';
+  | 'random_enemy'
+  | 'ally_lowest_hp';
 
 export interface EnemyIntent {
   type: EnemyIntentType;
