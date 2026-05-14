@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 import {
   PrimaryStat,
   Rarity,
@@ -13,7 +12,36 @@ export const ProgressionEvents = {
   LEVEL_UP: 'level_up',
 } as const;
 
-export const progressionEvents = new Phaser.Events.EventEmitter();
+type ProgressionEventName = typeof ProgressionEvents[keyof typeof ProgressionEvents];
+type ProgressionListener = (payload: LevelUpResult) => void;
+
+class ProgressionEventEmitter {
+  private listeners = new Map<ProgressionEventName, Set<ProgressionListener>>();
+
+  on(eventName: ProgressionEventName, listener: ProgressionListener): this {
+    const listeners = this.listeners.get(eventName) ?? new Set<ProgressionListener>();
+    listeners.add(listener);
+    this.listeners.set(eventName, listeners);
+    return this;
+  }
+
+  off(eventName: ProgressionEventName, listener: ProgressionListener): this {
+    this.listeners.get(eventName)?.delete(listener);
+    return this;
+  }
+
+  emit(eventName: ProgressionEventName, payload: LevelUpResult): boolean {
+    const listeners = this.listeners.get(eventName);
+    if (!listeners || listeners.size === 0) return false;
+
+    for (const listener of listeners) {
+      listener(payload);
+    }
+    return true;
+  }
+}
+
+export const progressionEvents = new ProgressionEventEmitter();
 
 export interface LevelUpResult {
   characterId: string;
@@ -190,7 +218,7 @@ export function describeStatReward(stat: StatKey, amount: number): string {
     power: 'Poder',
     defense: 'Defensa',
     speed: 'Velocidad',
-    crit: 'Critico',
+    crit: 'Crítico',
     resistance: 'Resistencia',
   };
   return `+${formatStatAmount(amount)} ${label[stat]}`;
@@ -199,13 +227,13 @@ export function describeStatReward(stat: StatKey, amount: number): string {
 export function rarityLabel(rarity: Rarity): string {
   switch (rarity) {
     case Rarity.COMMON:
-      return 'Comun';
+      return 'Común';
     case Rarity.UNCOMMON:
-      return 'Poco comun';
+      return 'Poco común';
     case Rarity.RARE:
       return 'Rara';
     case Rarity.EPIC:
-      return 'Epica';
+      return 'Épica';
     case Rarity.CURSED:
       return 'Maldita';
   }

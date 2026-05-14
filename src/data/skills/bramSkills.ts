@@ -16,7 +16,7 @@ const bramProvocarPlus: SkillData = {
   effects: [
     { type: 'buff', amount: 30 },
   ],
-  description: 'Redirige los proximos 2 ataques enemigos a Bram. +30% Defensa este turno.',
+  description: 'Redirige los próximos 2 ataques enemigos a Bram. +30% Defensa este turno.',
   characterId: 'bram',
 };
 

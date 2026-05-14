@@ -27,9 +27,9 @@ export const sets: SetData[] = [
       {
         piecesRequired: 2,
         effects: [
-          { type: 'stat_modifier', stat: 'crit', amount: 5, description: '+5% Critico' },
+          { type: 'stat_modifier', stat: 'crit', amount: 5, description: '+5% Crítico' },
         ],
-        description: '+5% Critico adicional.',
+        description: '+5% Crítico adicional.',
       },
     ],
   },

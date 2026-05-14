@@ -74,7 +74,7 @@ const STAT_LABELS: Record<StatKey, string> = {
   power: 'Poder',
   defense: 'Defensa',
   speed: 'Velocidad',
-  crit: 'Critico',
+  crit: 'Crítico',
   resistance: 'Resistencia',
 };
 
@@ -87,10 +87,10 @@ const RARITY_COLORS: Record<Rarity, number> = {
 };
 
 const RARITY_LABELS: Record<Rarity, string> = {
-  [Rarity.COMMON]: 'Comun',
-  [Rarity.UNCOMMON]: 'Poco comun',
+  [Rarity.COMMON]: 'Común',
+  [Rarity.UNCOMMON]: 'Poco común',
   [Rarity.RARE]: 'Rara',
-  [Rarity.EPIC]: 'Epica',
+  [Rarity.EPIC]: 'Épica',
   [Rarity.CURSED]: 'Maldita',
 };
 

@@ -143,8 +143,8 @@ export class RewardScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const title = this.summary.actComplete ? 'Acto 1 completado' : 'El Pregonero cae';
     const subtitle = this.summary.demoComplete
-      ? 'La demo del MVP termina aca. Gracias por jugar.'
-      : 'La voz del camino se apaga, pero deja una marca util.';
+      ? 'La demo del MVP termina acá. Gracias por jugar.'
+      : 'La voz del camino se apaga, pero deja una marca útil.';
     const itemLines = (this.summary.fixedRewardItemIds ?? [])
       .map((itemId) => `Reliquia: ${registry.getItem(itemId).name}`);
     const healLine = this.summary.partyHealPercent
@@ -381,7 +381,7 @@ export class RewardScene extends Phaser.Scene {
       kind: 'stat',
       title: describeStatReward(reward.stat, reward.amount),
       kicker: this.shortName(reward.characterName),
-      body: `Bonus permanente para la run. ${this.shortName(reward.characterName)} conserva esta mejora en los proximos combates.`,
+      body: `Bonus permanente para la run. ${this.shortName(reward.characterName)} conserva esta mejora en los próximos combates.`,
       accent: 0x87b879,
       characterId: reward.characterId,
       statReward: reward,

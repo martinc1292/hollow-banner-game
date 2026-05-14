@@ -6,6 +6,41 @@ import {
 } from '@/types';
 
 export const act1Events: EventData[] = [
+  // ── SANTUARIO DEL ESTANDARTE ──────────────────────────────────────────────
+  {
+    id: 'santuario_del_estandarte',
+    title: 'Santuario del Estandarte',
+    description:
+      'Un paño sin viento cuelga sobre piedra negra. La tela reconoce la sangre de la compañía y ofrece una gracia con deuda.',
+    options: [
+      {
+        id: 'blessing',
+        text: 'Aceptar la bendición',
+        resultText:
+          'El estandarte pesa menos durante un instante. La party sana y encuentra una reliquia entre cenizas apagadas.',
+        effects: [
+          { type: 'heal_party', percent: 0.2 },
+          { type: 'gain_item', rarity: Rarity.RARE, relicOnly: true },
+        ],
+      },
+      {
+        id: 'curse',
+        text: 'Tomar la deuda',
+        resultText:
+          'La tela se enrolla sobre una reliquia maldita. El camino concede poder, pero deja una marca abierta.',
+        effects: [
+          { type: 'gain_item', rarity: Rarity.CURSED, relicOnly: true, includeCursed: true },
+          {
+            type: 'gain_status_party',
+            statusId: StatusEffectId.VULNERABLE,
+            stacks: 1,
+            duration: 2,
+          },
+        ],
+      },
+    ],
+  },
+
   // ── CARAVANA ABANDONADA ────────────────────────────────────────────────────
   {
     id: 'caravana_abandonada',
@@ -99,7 +134,7 @@ export const act1Events: EventData[] = [
       {
         id: 'hurry',
         text: 'Apurar el final',
-        resultText: 'Obtienen 20g. El silencio pesa: toda la party queda Debilitada para el proximo combate.',
+        resultText: 'Obtienen 20g. El silencio pesa: toda la party queda Debilitada para el próximo combate.',
         effects: [
           { type: 'gain_gold', amount: 20 },
           {
@@ -416,7 +451,7 @@ export const act1Events: EventData[] = [
       {
         id: 'accept',
         text: 'Aceptar el pacto',
-        resultText: 'La marca arde en todas las manos. Toda la party gana +2 Ataque y +2 Poder, pero queda Debilitada al inicio del proximo combate.',
+        resultText: 'La marca arde en todas las manos. Toda la party gana +2 Ataque y +2 Poder, pero queda Debilitada al inicio del próximo combate.',
         effects: [
           { type: 'modify_party_stat', stat: 'attack', amount: 2 },
           { type: 'modify_party_stat', stat: 'power', amount: 2 },

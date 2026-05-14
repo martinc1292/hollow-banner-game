@@ -225,13 +225,13 @@ export function itemRarityColor(rarity: Rarity): number {
 export function itemRarityLabel(rarity: Rarity): string {
   switch (rarity) {
     case Rarity.COMMON:
-      return 'Comun';
+      return 'Común';
     case Rarity.UNCOMMON:
-      return 'Poco comun';
+      return 'Poco común';
     case Rarity.RARE:
       return 'Rara';
     case Rarity.EPIC:
-      return 'Epica';
+      return 'Épica';
     case Rarity.CURSED:
       return 'Maldita';
   }
@@ -252,7 +252,7 @@ export function statLabel(stat: StatKey): string {
     case 'speed':
       return 'Velocidad';
     case 'crit':
-      return 'Critico';
+      return 'Crítico';
     case 'resistance':
       return 'Resistencia';
   }

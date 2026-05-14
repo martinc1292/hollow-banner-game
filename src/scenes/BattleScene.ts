@@ -2,8 +2,38 @@ import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
 import { makeTextButton } from '@/ui/TextButton';
 import { registry } from '@/data/Registry';
+import { getSpecialCombatReward } from '@/data/SpecialCombatRewards';
 import { THEME } from '@/ui/UITheme';
 import { drawCornerBox, drawSeparator, addVignette } from '@/ui/UIHelpers';
+import {
+  ACTIVE_TURN_STROKE,
+  DEFAULT_ENCOUNTER_ID,
+  DEFAULT_STROKE_COLOR,
+  DOWN_COLOR,
+  ENEMY_COLOR,
+  ENEMY_SLOT_COUNT,
+  HP_BAR_BG,
+  HP_BAR_FG,
+  HP_BAR_FG_LOW,
+  LOG_LINES,
+  PARTY_COLOR,
+  PARTY_SLOT_COUNT,
+  PARTY_SLOT_HEIGHT,
+  PARTY_SLOT_WIDTH,
+  PORTRAIT_ASSETS,
+  RESOURCE_BAR_BG,
+  RESOURCE_BAR_MANA,
+  RESOURCE_BAR_VIGOR,
+  ROW_ACTIONS_Y,
+  ROW_ENEMY_Y,
+  ROW_PARTY_Y,
+  SLOT_HEIGHT,
+  SLOT_SPACING,
+  SLOT_WIDTH,
+  TARGET_STROKE_COLOR,
+  TURN_QUEUE_Y,
+} from '@/scenes/battle/BattleSceneLayout';
+import type { SlotView } from '@/scenes/battle/BattleSceneViewTypes';
 import { gameState } from '@/systems/GameState';
 import { saveManager } from '@/systems/SaveManager';
 import { soundManager } from '@/systems/SoundManager';
@@ -54,77 +84,6 @@ import {
 export interface BattleSceneInitData {
   party?: CharacterInstance[];
   encounterId?: string;
-}
-
-interface SpecialCombatReward {
-  goldOverride?: number;
-  fixedRewardItemIds?: string[];
-  actComplete?: boolean;
-  demoComplete?: boolean;
-  partyHealPercent?: number;
-}
-
-const DEFAULT_ENCOUNTER_ID = 'act1_normal_bandit_pair';
-const PARTY_SLOT_COUNT = 4;
-const ENEMY_SLOT_COUNT = 4;
-const SLOT_WIDTH = 160;
-const SLOT_HEIGHT = 110;
-const PARTY_SLOT_WIDTH = 140;
-const PARTY_SLOT_HEIGHT = 200;
-const SLOT_SPACING = 20;
-
-// Vertical layout rows (for a 720px-tall canvas)
-const ROW_ENEMY_Y = 210;          // centro de los slots de enemigos
-const ROW_PARTY_Y = 430;          // centro de los slots del party
-const ROW_ACTIONS_Y = 590;        // fila de botones de acción
-
-const PORTRAIT_ASSETS: Record<string, string> = {
-  bram: 'battle_portrait_bram',
-  vera: 'battle_portrait_vera',
-  mira: 'battle_portrait_mira',
-  aren: 'battle_portrait_aren',
-  lyra: 'battle_portrait_lyra',
-};
-
-const PARTY_COLOR = 0x2c4a7d;
-const ENEMY_COLOR = 0x7d2c2c;
-const DOWN_COLOR = 0x2a2a2a;
-const TARGET_STROKE_COLOR = 0xffd166;
-const DEFAULT_STROKE_COLOR = 0xffffff;
-const ACTIVE_TURN_STROKE = 0x00ff88;
-
-// HP bar colors
-const HP_BAR_BG = 0x3a1a1a;
-const HP_BAR_FG = 0x3cb371;
-const HP_BAR_FG_LOW = 0xd94f2e;
-const RESOURCE_BAR_VIGOR = 0x4a90d9;
-const RESOURCE_BAR_MANA = 0x9b59b6;
-const RESOURCE_BAR_BG = 0x1a1a3a;
-
-// Layout
-const LOG_LINES = 5;
-const TURN_QUEUE_Y = 88;
-
-interface SlotView {
-  combatant: Combatant;
-  rect: Phaser.GameObjects.Rectangle;
-  portrait: Phaser.GameObjects.Image | null;
-  nameText: Phaser.GameObjects.Text;
-  hpText: Phaser.GameObjects.Text;
-  hpBarBg: Phaser.GameObjects.Rectangle;
-  hpBarFg: Phaser.GameObjects.Rectangle;
-  resourceText: Phaser.GameObjects.Text;
-  vigorBarBg: Phaser.GameObjects.Rectangle | null;
-  vigorBarFg: Phaser.GameObjects.Rectangle | null;
-  manaBarBg: Phaser.GameObjects.Rectangle | null;
-  manaBarFg: Phaser.GameObjects.Rectangle | null;
-  battleText: Phaser.GameObjects.Text;
-  intentText: Phaser.GameObjects.Text | null;
-  statusObjects: Phaser.GameObjects.GameObject[];
-  baseColor: number;
-  baseX: number;
-  baseY: number;
-  isParty: boolean;
 }
 
 export class BattleScene extends Phaser.Scene {
@@ -1246,7 +1205,7 @@ export class BattleScene extends Phaser.Scene {
 
       const xpGained = getCombatXp(this.activeEncounter.type);
       const xpResult = awardXp(this.state.party, xpGained);
-      const specialReward = this.resolveSpecialCombatReward();
+      const specialReward = getSpecialCombatReward(this.activeEncounter.id);
       const goldGained = specialReward.goldOverride ?? rollCombatGold(this.activeEncounter.type);
       gameState.addGold(goldGained);
       this.grantFixedRewardItems(specialReward.fixedRewardItemIds ?? []);
@@ -1278,21 +1237,6 @@ export class BattleScene extends Phaser.Scene {
       soundManager.play('defeat');
       this.time.delayedCall(this.animDuration(2000), () => this.scene.start(SceneKeys.GAME_OVER));
     });
-  }
-
-  private resolveSpecialCombatReward(): SpecialCombatReward {
-    if (this.activeEncounter.id === 'act1_miniboss_pregonero') {
-      return { goldOverride: 80, fixedRewardItemIds: ['marca_pregonero'] };
-    }
-    if (this.activeEncounter.id === 'act1_boss_padre_oxidado') {
-      return {
-        fixedRewardItemIds: ['yelmo_padre'],
-        actComplete: true,
-        demoComplete: true,
-        partyHealPercent: 0.5,
-      };
-    }
-    return {};
   }
 
   private grantFixedRewardItems(itemIds: string[]): void {

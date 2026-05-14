@@ -167,7 +167,7 @@ export class MapScene extends Phaser.Scene {
     }).setOrigin(1, 0));
 
     const partyButton = makeTextButton(this, 95, 116, 'VER PARTY', () => {
-      this.showToast('Party (a implementar)');
+      this.scene.start(SceneKeys.INVENTORY, { returnScene: SceneKeys.MAP });
     }, { fontSize: '14px', letterSpacing: 2 });
     this.addMapObject(partyButton);
 
@@ -306,11 +306,14 @@ export class MapScene extends Phaser.Scene {
     if (node.type === 'camp') { this.scene.start(SceneKeys.CAMP); return; }
     if (node.type === 'treasure') { this.scene.start(SceneKeys.TREASURE); return; }
     if (node.type === 'event') { this.scene.start(SceneKeys.EVENT, { eventId: node.eventId }); return; }
+    if (node.type === 'special') {
+      this.scene.start(SceneKeys.EVENT, { eventId: 'santuario_del_estandarte' });
+      return;
+    }
 
     mapState.completeNode(node.id);
     saveManager.save();
     this.renderMap();
-    this.showToast(`${NODE_NAMES[node.type]} (a implementar)`);
   }
 
   private startCombatNode(node: MapNode): void {

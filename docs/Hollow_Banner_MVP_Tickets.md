@@ -2,6 +2,7 @@
 
 **Stack:** Phaser 3 + TypeScript + Vite
 **Objetivo:** MVP jugable del Acto 1 completo, corriendo en browser
+**Estado actual:** el proyecto real ya está montado en Phaser/Vite y apunta a estabilizar el Acto 1 antes de ampliar contenido.
 **Modo de trabajo:** cada ticket es una unidad de trabajo. Pasarle uno a la vez a Claude Code, validar que funciona, commitear, siguiente.
 
 ---

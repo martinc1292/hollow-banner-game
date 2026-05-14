@@ -14,7 +14,7 @@
 | Título tentativo | **Hollow Banner** (alt: *Of Ash and Iron*, *The Pale March*) |
 | Género | Roguelite táctico por turnos, party-based |
 | Plataformas objetivo | PC (Steam) como prioridad. Web (HTML5) como objetivo secundario tras MVP |
-| Motor | Godot 4.x |
+| Motor | Phaser 3 + TypeScript + Vite para el MVP web actual. Godot 4.x queda como referencia histórica/posible dirección futura. |
 | Duración estimada de una run | 60–90 min (objetivo de diseño; ver §3) |
 | Tipo de jugador objetivo | Fans de StS, Darkest Dungeon, For the King, Into the Breach. Disfruta runs cortas, builds, lectura táctica del enemigo |
 | Modelo | Single-player, offline |

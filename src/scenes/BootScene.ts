@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SceneKeys } from '@/config/SceneKeys';
+import { soundManager } from '@/systems/SoundManager';
 import { THEME } from '@/ui/UITheme';
 
 export class BootScene extends Phaser.Scene {
@@ -9,6 +10,7 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.scale;
+    soundManager.attachScene(this);
 
     this.add.rectangle(width / 2, height / 2, width, height, THEME.bgDeep, 1);
     this.add.text(width / 2, height / 2, 'HOLLOW BANNER', {
